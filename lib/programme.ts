@@ -1,0 +1,82 @@
+// lib/programme.ts
+// Source unique du programme — partagée entre tous les composants
+
+import type { Day } from '@/types'
+
+export const DAYS: Day[] = [
+  {
+    name: 'DOS & LARGEUR',
+    focus: 'Grand dorsal · Trapèzes · Biceps + rappel Épaules',
+    label: 'JOUR 1',
+    clr: '#00d4ff',
+    grad: 'linear-gradient(110deg,#00d4ff,#0099bb)',
+    muscles: ['Dos', 'Biceps', 'Trapèzes'],
+    exercises: [
+      { name: 'Tractions (prise large)',        ill: '🏋️', cat: 'Grand dorsal · largeur',     sets: 5, reps: '5–8',     tip: 'Extension COMPLÈTE en bas. Coudes vers les hanches.', tall: 'À 2m04, amplitude = avantage. Exploite chaque centimètre.' },
+      { name: 'Tirage poulie haute (large)',     ill: '🎯', cat: 'Grand dorsal · Rhomboïdes',  sets: 4, reps: '8–10',    tip: 'Barre au sternum, buste légèrement incliné.',          tall: 'Bloque tes genoux — morphologie grande.' },
+      { name: 'Rowing poulie basse (neutre)',    ill: '⚓', cat: 'Dos épais · Rhomboïdes',     sets: 4, reps: '8–12',    tip: 'Dos droit. Rétraction maximale des omoplates.',         tall: 'Prise neutre = zéro stress lombaire.' },
+      { name: 'Rowing haltère unilatéral',       ill: '🔄', cat: 'Grand dorsal · Biceps',      sets: 4, reps: '10–12',   tip: 'Vers la hanche, maintien 1s. Appui banc obligatoire.',  tall: 'Appui total = mouvement pur.' },
+      { name: 'Face pull corde (poulie haute)',  ill: '🎪', cat: 'Trapèzes · Rotateurs',       sets: 4, reps: '15–20',   tip: 'Poulie à hauteur yeux. Coudes AU-DESSUS des épaules.',  tall: 'Essentiel pour tes longues épaules.' },
+      { name: 'Élévations latérales (câble)',    ill: '🦅', cat: 'Deltoïde latéral',            sets: 4, reps: '15–20',   tip: 'Tension constante. Légère rotation externe, no swing.', tall: 'Rappel épaules = V-taper permanent.' },
+      { name: 'Curl barre EZ prise large',       ill: '💪', cat: 'Biceps long',                 sets: 4, reps: '8–10',    tip: 'Coudes fixes. Descente sur 3s.',                        tall: '' },
+      { name: 'Curl concentré haltère (assis)',  ill: '🎯', cat: 'Biceps · Pic',                sets: 3, reps: '10–12',   tip: 'Coude sur cuisse. Supination max en haut.',             tall: '' },
+    ],
+  },
+  {
+    name: 'TORSE & ÉPAULES',
+    focus: 'Pectoraux · Épaules · Triceps + rappel Core',
+    label: 'JOUR 2',
+    clr: '#ff6b35',
+    grad: 'linear-gradient(110deg,#ff6b35,#cc4420)',
+    muscles: ['Pectoraux', 'Épaules', 'Triceps'],
+    exercises: [
+      { name: 'Développé couché haltères',       ill: '🏋️', cat: 'Pectoraux · Force',           sets: 5, reps: '6–10',    tip: 'Descends à étirement complet. Rotation naturelle poignets.', tall: 'Longs bras = course immense.' },
+      { name: 'Développé incliné haltères 30°',  ill: '📐', cat: 'Pectoraux hauts',              sets: 4, reps: '8–10',    tip: '30° max pour rester sur le pec.',                           tall: '' },
+      { name: 'Pec deck / Écarté machine',       ill: '🦋', cat: 'Pectoraux · Isolation',        sets: 4, reps: '12–15',   tip: 'Étirement max en bas, contraction + 1s en haut.',           tall: 'Adapte l\'écartement à tes bras longs.' },
+      { name: 'Développé militaire haltères',    ill: '🚀', cat: 'Épaules · Deltoïdes',          sets: 4, reps: '8–10',    tip: 'Assis, dos droit. Ne verrouille pas les coudes.',           tall: 'Épaules larges = V-taper immédiat.' },
+      { name: 'Élévations latérales haltères',   ill: '🦅', cat: 'Deltoïde latéral',             sets: 5, reps: '12–15',   tip: 'Légère flexion buste. Pouces vers le haut. No swing.',     tall: '5 séries. LE muscle le plus impactant.' },
+      { name: 'Oiseau haltères (rear delt)',      ill: '🦤', cat: 'Deltoïde post.',               sets: 4, reps: '15–20',   tip: 'Penché 45°, coudes légèrement fléchis.',                   tall: '' },
+      { name: 'Extension triceps corde',          ill: '🔱', cat: 'Triceps',                      sets: 4, reps: '12–15',   tip: 'Coudes fixes. Écarte en bas, contraction max.',             tall: '' },
+      { name: 'Skullcrusher EZ (banc incliné)',   ill: '💥', cat: 'Triceps long',                 sets: 3, reps: '8–12',    tip: 'Banc incliné. Descente vers le front.',                     tall: '' },
+      { name: 'Rappel — Crunch câble',            ill: '🔁', cat: 'Core · Rappel',               sets: 3, reps: '15–20',   tip: 'Charges légères, focus contraction. 10 min max.',          tall: '', isRecap: true, recapZone: 'Abdominaux' },
+      { name: 'Rappel — Gainage planche',         ill: '🔁', cat: 'Core · Rappel',               sets: 2, reps: '45–60s',  tip: 'Corps aligné. Variante bras/jambe si trop facile.',        tall: '', isRecap: true, recapZone: 'Abdominaux' },
+    ],
+  },
+  {
+    name: 'JAMBES',
+    focus: 'Quadriceps · Ischios · Fessiers · Mollets + rappel Épaules',
+    label: 'JOUR 3',
+    clr: '#8b5cf6',
+    grad: 'linear-gradient(110deg,#8b5cf6,#5b21b6)',
+    muscles: ['Quadriceps', 'Fessiers', 'Ischios', 'Mollets'],
+    exercises: [
+      { name: 'Squat barre (stance large)',       ill: '👑', cat: 'Quadriceps · Fessiers',        sets: 5, reps: '5–8',     tip: 'High bar, buste vertical. Pieds à 35-45°.',              tall: 'Stance large compense les longs tibias.' },
+      { name: 'Leg press (pieds hauts écartés)',  ill: '🦾', cat: 'Quadriceps · Fessiers',        sets: 4, reps: '10–12',   tip: 'Amplitude max, fessiers sur la plateforme.',             tall: 'Pieds hauts = adapté à tes longs fémurs.' },
+      { name: 'Fentes bulgares haltères',         ill: '⚡', cat: 'Fessiers · Quadriceps',        sets: 4, reps: '10/jambe', tip: 'Grand pas, genou avant à 90°.',                          tall: 'Banc à hauteur mollet MAX.' },
+      { name: 'Leg curl couché (ischio)',          ill: '🔄', cat: 'Ischios',                      sets: 5, reps: '8–12',    tip: 'Pied en flexion dorsale. Descente 3s.',                  tall: '' },
+      { name: 'Hip thrust machine (guidée)',       ill: '🍑', cat: 'Grand fessier',                sets: 4, reps: '10–12',   tip: 'Contraction max, maintien 1s en haut.',                  tall: 'Machine guidée = zéro lombaire.' },
+      { name: 'Leg extension (quadriceps)',        ill: '🦵', cat: 'Quadriceps · VMO',             sets: 4, reps: '12–15',   tip: 'Pieds en rotation interne. Maintien 1s.',                tall: '' },
+      { name: 'Good morning léger (barre)',        ill: '🌅', cat: 'Ischios · Mobilité',           sets: 3, reps: '12–15',   tip: 'Léger ! Hip hinge pur, dos droit.',                      tall: 'Version légère seulement.' },
+      { name: 'Mollets debout machine (unilat.)',  ill: '🦶', cat: 'Mollets',                      sets: 5, reps: '15–20',   tip: 'Une jambe. Amplitude totale. Montée explosive.',         tall: '5 séries. Longs tibias = volume obligatoire.' },
+      { name: 'Rappel — Élévations latérales',    ill: '🔁', cat: 'Épaules · Rappel',             sets: 3, reps: '20–25',   tip: 'Charges très légères, tempo lent. En toute fin.',        tall: 'Deltoïde récupère vite. 3 séries légères = gros bénéfice.', isRecap: true, recapZone: 'Épaules' },
+    ],
+  },
+  {
+    name: 'ABDOS & CORE',
+    focus: 'Rappel Dos · Épaules + Abdominaux · Core · Obliques',
+    label: 'JOUR 4',
+    clr: '#00e87a',
+    grad: 'linear-gradient(110deg,#00e87a,#00b85c)',
+    muscles: ['Abdominaux', 'Core', 'Obliques'],
+    exercises: [
+      { name: 'Rappel — Tractions / Tirage poulie', ill: '🔁', cat: 'Dos · Rappel',            sets: 4, reps: '8–10',    tip: 'Tractions ou tirage poulie. Le rappel le plus important.', tall: 'Doubler la fréquence grand dorsal = gains accélérés.', isRecap: true, recapZone: 'Dos large' },
+      { name: 'Rappel — Face pull',                 ill: '🔁', cat: 'Épaules · Rappel',        sets: 3, reps: '15–20',   tip: 'Même technique que jour 1. Santé + volume.',              tall: '', isRecap: true, recapZone: 'Épaules' },
+      { name: 'Crunch câble agenouillé',            ill: '🎪', cat: 'Grand droit',              sets: 5, reps: '12–15',   tip: 'Enroule vers les genoux, pas vers l\'avant.',             tall: 'Résistance constante = zéro lombaire.' },
+      { name: 'Leg raise suspendu (barre)',          ill: '🏗️', cat: 'Abdos bas',               sets: 4, reps: '10–15',   tip: 'Au-delà de la parallèle. No balancier.',                  tall: 'Genoux fléchis pour commencer.' },
+      { name: 'Ab wheel (roue abdominale)',          ill: '⚙️', cat: 'Core profond',            sets: 4, reps: '8–12',    tip: 'Gainage TOTAL. Descente ultra-lente.',                    tall: 'Longs bras = avantage levier.' },
+      { name: 'Planche latérale + rotation',        ill: '〰️', cat: 'Obliques',                sets: 4, reps: '12/côté', tip: 'Rotation bras sous le buste en spirale.',                 tall: '' },
+      { name: 'Rotation câble debout',              ill: '🌀', cat: 'Obliques · Taille',        sets: 4, reps: '15/côté', tip: 'Rotation buste seul. Jambes fixes.',                      tall: '' },
+      { name: 'Gainage planche (variantes)',        ill: '🧱', cat: 'Transverse · Core',        sets: 4, reps: '45–60s',  tip: 'Trop facile → élévation alternée bras/jambe.',           tall: '' },
+    ],
+  },
+]
