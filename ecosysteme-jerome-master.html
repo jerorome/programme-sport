@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Écosystème de Vie — Jérôme · Master Plan v4</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Arial, sans-serif; background: #0c0e14; color: #e2e8f0; padding-top: 56px; }
+
+/* ── NAV STICKY ── */
+.nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: #0c0e14ee; backdrop-filter: blur(12px); border-bottom: 1px solid #1e2538; height: 52px; display: flex; align-items: center; padding: 0 20px; gap: 4px; overflow-x: auto; }
+.nav a { color: #64748b; font-size: 0.7rem; font-weight: 600; text-decoration: none; padding: 5px 10px; border-radius: 6px; white-space: nowrap; transition: all 0.15s; }
+.nav a:hover, .nav a.active { background: #1e2538; color: #e2e8f0; }
+.nav-title { font-size: 0.75rem; font-weight: 800; color: #818cf8; margin-right: 8px; white-space: nowrap; }
+.nav-sep { color: #1e2538; margin: 0 2px; }
+
+/* ── HEADER ── */
+.header { text-align: center; padding: 40px 20px 32px; }
+.header h1 { font-size: 1.9rem; font-weight: 800; color: #fff; margin-bottom: 6px; }
+.header p { color: #64748b; font-size: 0.85rem; }
+.version { display: inline-block; background: #1e2538; border: 1px solid #2d3555; border-radius: 20px; padding: 3px 14px; font-size: 0.72rem; color: #60a5fa; margin-top: 8px; }
+.stats-row { display: flex; justify-content: center; gap: 24px; margin-top: 20px; flex-wrap: wrap; }
+.stat { text-align: center; }
+.stat-num { font-size: 1.6rem; font-weight: 800; color: #818cf8; }
+.stat-lbl { font-size: 0.68rem; color: #475569; }
+
+/* ── SCHEMA ── */
+.schema-wrap { max-width: 1040px; margin: 0 auto 48px; padding: 0 20px; }
+.schema-title { text-align: center; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #475569; margin-bottom: 20px; }
+.schema-container { position: relative; width: 100%; height: 540px; }
+.schema-container svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+.snode { position: absolute; transform: translate(-50%,-50%); text-align: center; z-index: 2; }
+.snode-center { width: 86px; height: 86px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg,#4f46e5,#818cf8); box-shadow: 0 0 40px #6366f133; cursor: default; }
+.snode-center span { font-size: 1.5rem; }
+.snode-center small { font-size: 0.62rem; font-weight: 800; color: #fff; margin-top: 2px; }
+.domain-node { width: 80px; height: 80px; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; text-decoration: none; }
+.domain-node:hover { transform: translate(-50%,-50%) scale(1.1); box-shadow: 0 0 20px #ffffff22; }
+.domain-node .ico { font-size: 1.5rem; margin-bottom: 3px; }
+.domain-node .lbl { font-size: 0.58rem; font-weight: 700; line-height: 1.2; color: #fff; }
+.dtag { display: inline-block; border-radius: 4px; padding: 2px 6px; font-size: 0.56rem; font-weight: 600; margin: 1px; white-space: nowrap; }
+.sub-tags { margin-top: 5px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+
+/* Domain colors */
+.d1 { background: #1e1b4b; border: 1px solid #6366f166; } .d1 .lbl,.d1t { color: #a5b4fc; } .d1t { background: #312e8155; }
+.d2 { background: #292107; border: 1px solid #f59e0b66; } .d2 .lbl,.d2t { color: #fcd34d; } .d2t { background: #78350f55; }
+.d3 { background: #052e16; border: 1px solid #10b98166; } .d3 .lbl,.d3t { color: #6ee7b7; } .d3t { background: #064e3b55; }
+.d4 { background: #300720; border: 1px solid #ec489966; } .d4 .lbl,.d4t { color: #fbcfe8; } .d4t { background: #50072455; }
+.d5 { background: #0a2540; border: 1px solid #3b82f666; } .d5 .lbl,.d5t { color: #93c5fd; } .d5t { background: #1e3a5f55; }
+.d6 { background: #0d2b27; border: 1px solid #14b8a666; } .d6 .lbl,.d6t { color: #99f6e4; } .d6t { background: #13403b55; }
+.d7 { background: #1e0535; border: 1px solid #a78bfa66; } .d7 .lbl,.d7t { color: #e9d5ff; } .d7t { background: #2e106555; }
+.d8 { background: #072048; border: 1px solid #60a5fa66; } .d8 .lbl,.d8t { color: #bfdbfe; } .d8t { background: #1e3a8a55; }
+.d9 { background: #1a0a00; border: 1px solid #fb923c66; } .d9 .lbl,.d9t { color: #fdba74; } .d9t { background: #7c2d1255; }
+.d10{ background: #042713; border: 1px solid #4ade8066; } .d10 .lbl,.d10t { color: #86efac; } .d10t { background: #14532d55; }
+
+/* ── SECTIONS ── */
+.main { max-width: 1040px; margin: 0 auto; padding: 0 20px 60px; }
+.section { margin-bottom: 12px; border-radius: 14px; overflow: hidden; border: 1px solid #1e2538; }
+.section-header { display: flex; align-items: center; gap: 12px; padding: 16px 20px; cursor: pointer; background: #131720; transition: background 0.15s; user-select: none; }
+.section-header:hover { background: #1a1f2e; }
+.section-header .num { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800; color: #fff; flex-shrink: 0; }
+.section-header h2 { font-size: 0.95rem; font-weight: 700; color: #e2e8f0; flex: 1; }
+.section-header .emoji { font-size: 1.1rem; }
+.section-header .chevron { color: #475569; font-size: 0.8rem; transition: transform 0.2s; flex-shrink: 0; }
+.section-header.open .chevron { transform: rotate(180deg); }
+.section-body { background: #0f1219; padding: 0 20px 20px; display: none; }
+.section-body.open { display: block; padding-top: 16px; }
+
+/* ── STATUS BADGES ── */
+.status { display: inline-flex; align-items: center; gap: 5px; border-radius: 20px; padding: 2px 10px; font-size: 0.68rem; font-weight: 700; margin-left: 8px; }
+.s-live   { background: #064e3b; color: #34d399; }
+.s-ready  { background: #064e3b; color: #34d399; }
+.s-soon   { background: #1e3a5f; color: #60a5fa; }
+.s-later  { background: #1e1b4b; color: #818cf8; }
+.s-ongoing{ background: #451a03; color: #fbbf24; }
+
+/* ── GRIDS & CARDS ── */
+.grid { display: grid; gap: 10px; }
+.g2 { grid-template-columns: 1fr 1fr; }
+.g3 { grid-template-columns: 1fr 1fr 1fr; }
+.g4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+.g5 { grid-template-columns: repeat(5,1fr); }
+.card { background: #131720; border: 1px solid #1e2538; border-radius: 10px; padding: 14px; }
+.card h3 { font-size: 0.8rem; font-weight: 700; margin-bottom: 8px; }
+.card p { font-size: 0.75rem; color: #64748b; line-height: 1.5; margin-top: 6px; }
+.card .sub { font-size: 0.68rem; color: #334155; text-transform: uppercase; letter-spacing: 0.05em; margin: 10px 0 4px; }
+.tags { display: flex; flex-wrap: wrap; gap: 3px; }
+.tag { border-radius: 4px; padding: 2px 7px; font-size: 0.68rem; font-weight: 600; }
+
+/* Tag palettes */
+.tp { background:#312e8133; color:#a5b4fc; }
+.tb { background:#0c4a6e33; color:#7dd3fc; }
+.tg { background:#064e3b33; color:#6ee7b7; }
+.to { background:#78350f33; color:#fcd34d; }
+.tk { background:#50072433; color:#fbcfe8; }
+.tt { background:#13403b33; color:#99f6e4; }
+.tv { background:#2e106533; color:#ddd6fe; }
+.tr { background:#7f1d1d33; color:#fca5a5; }
+.tn { background:#1a3a1a33; color:#86efac; }
+.tw { background:#ffffff11; color:#cbd5e1; }
+.ty { background:#1e3a5f33; color:#93c5fd; }
+
+/* ── AUTO ITEMS ── */
+.auto-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.auto-item { background: #131720; border: 1px solid #1e2538; border-radius: 9px; padding: 12px 14px; display: flex; gap: 10px; }
+.auto-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+.auto-body h4 { font-size: 0.78rem; font-weight: 700; color: #e2e8f0; margin-bottom: 3px; }
+.auto-body p { font-size: 0.72rem; color: #64748b; line-height: 1.4; }
+.soft-badge { display: inline-block; background: #0d2b27; color: #2dd4bf; border-radius: 4px; padding: 1px 7px; font-size: 0.65rem; font-weight: 700; margin-top: 4px; }
+
+/* ── DEVICES ── */
+.devices { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.device { background: #131720; border: 1px solid #1e2538; border-radius: 10px; padding: 14px; text-align: center; }
+.device .ico { font-size: 2rem; margin-bottom: 6px; }
+.device .role { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.device h3 { font-size: 0.8rem; font-weight: 700; color: #e2e8f0; margin-bottom: 4px; }
+.device p { font-size: 0.72rem; color: #64748b; line-height: 1.4; }
+
+/* ── FLOW ── */
+.flow-row { display: flex; align-items: center; flex-wrap: wrap; gap: 0; margin-top: 12px; }
+.fbox { background: #131720; border: 1px solid #1e2538; border-radius: 8px; padding: 8px 10px; font-size: 0.7rem; font-weight: 600; text-align: center; flex: 1; min-width: 70px; }
+.farr { color: #2d3555; font-size: 1rem; padding: 0 3px; flex-shrink: 0; }
+
+/* ── ROADMAP ── */
+.roadmap { display: flex; flex-direction: column; gap: 8px; }
+.step { display: flex; gap: 14px; align-items: flex-start; background: #131720; border: 1px solid #1e2538; border-radius: 10px; padding: 12px 16px; }
+.step-num { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800; flex-shrink: 0; color: #fff; }
+.step-body h4 { font-size: 0.82rem; font-weight: 700; color: #e2e8f0; margin-bottom: 3px; }
+.step-body p { font-size: 0.72rem; color: #64748b; line-height: 1.4; }
+
+/* ── NOTION PAGES ── */
+.notion-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 8px; }
+.np { background: #0f1219; border: 1px solid #1e2538; border-radius: 8px; padding: 10px; text-align: center; }
+.np .ico { font-size: 1.2rem; display: block; margin-bottom: 4px; }
+.np .lbl { font-size: 0.68rem; color: #94a3b8; margin-top: 2px; }
+
+/* ── MONO ── */
+.mono-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.mono-card { background: #131720; border-radius: 10px; padding: 14px; border: 1px solid #1e2538; }
+.mono-card .phase { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.mono-card h4 { font-size: 0.85rem; font-weight: 700; margin-bottom: 6px; }
+.mono-card p { font-size: 0.72rem; color: #64748b; line-height: 1.4; }
+
+/* ── BACKUP ── */
+.backup-row { display: grid; grid-template-columns: repeat(5,1fr); gap: 0; align-items: center; }
+.bnode { background: #131720; border: 1px solid #1e2538; border-radius: 8px; padding: 10px 6px; text-align: center; font-size: 0.7rem; font-weight: 600; }
+.barr { text-align: center; color: #2d3555; font-size: 1rem; }
+
+/* ── PERSONAL BRANDING ── */
+.pb-split { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.pb-public { background: #131720; border: 1px solid #60a5fa44; border-radius: 12px; padding: 16px; }
+.pb-private { background: #131720; border: 1px solid #6366f144; border-radius: 12px; padding: 16px; }
+.pb-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px; }
+
+/* ── SOFT CARD ── */
+.soft-card { background: linear-gradient(135deg, #0d1a2a, #0a1a14); border: 1px solid #14b8a633; border-radius: 12px; padding: 16px; }
+.soft-card p { font-size: 0.8rem; color: #94a3b8; line-height: 1.6; font-style: italic; }
+
+/* ── ACCOUNTS TABLE ── */
+.acc-table { width: 100%; border-collapse: collapse; font-size: 0.73rem; }
+.acc-table th { text-align: left; color: #475569; font-weight: 700; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 8px 10px; border-bottom: 1px solid #1e2538; }
+.acc-table td { padding: 7px 10px; border-bottom: 1px solid #1e253844; color: #94a3b8; }
+.acc-table tr:hover td { background: #131720; }
+.acc-table .acc-name { color: #e2e8f0; font-weight: 600; }
+
+@media (max-width: 700px) {
+  .g2,.g3,.g4,.g5,.devices,.mono-grid,.pb-split { grid-template-columns: 1fr; }
+  .auto-grid,.notion-grid { grid-template-columns: 1fr; }
+  .backup-row { grid-template-columns: 1fr; }
+  .schema-container { height: 360px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV STICKY -->
+<nav class="nav">
+  <span class="nav-title">🌐 Jérôme</span>
+  <span class="nav-sep">·</span>
+  <a href="#schema">Schéma</a>
+  <a href="#infra">Infrastructure</a>
+  <a href="#services">Services Pi</a>
+  <a href="#openclaw">OpenClaw</a>
+  <a href="#auto">Automatisations</a>
+  <a href="#rituels">Rituels</a>
+  <a href="#video">Vidéo</a>
+  <a href="#mono">Monétisation</a>
+  <a href="#projets">Projets</a>
+  <a href="#notion">Notion</a>
+  <a href="#backup">Backup</a>
+  <a href="#comptes">Comptes</a>
+  <a href="#sante">Santé</a>
+  <a href="#social">Social</a>
+  <a href="#logement">Logement</a>
+  <a href="#culture">Culture</a>
+  <a href="#creativite">Créativité</a>
+  <a href="#eco">Éco</a>
+  <a href="#branding">Branding</a>
+  <a href="#citoyennete">Citoyenneté</a>
+  <a href="#roadmap">Roadmap</a>
+</nav>
+
+<!-- HEADER -->
+<div class="header">
+  <h1>🌐 Écosystème de Vie — Jérôme</h1>
+  <p>Infrastructure · Automatisation · Créativité · Bien-être · Personal Branding</p>
+  <span class="version">Master Plan v4 · Mars 2026</span>
+  <div class="stats-row">
+    <div class="stat"><div class="stat-num">20</div><div class="stat-lbl">Domaines de vie</div></div>
+    <div class="stat"><div class="stat-num">7</div><div class="stat-lbl">Projets actifs</div></div>
+    <div class="stat"><div class="stat-num">26+</div><div class="stat-lbl">Automatisations</div></div>
+    <div class="stat"><div class="stat-num">0</div><div class="stat-lbl">GAFAM</div></div>
+    <div class="stat"><div class="stat-num">3-2-1</div><div class="stat-lbl">Règle backup</div></div>
+    <div class="stat"><div class="stat-num">~10€</div><div class="stat-lbl">API/mois</div></div>
+  </div>
+</div>
+
+<!-- SCHÉMA VISUEL -->
+<div id="schema" class="schema-wrap">
+  <p class="schema-title">Schéma Global — Tout l'écosystème d'un coup d'oeil</p>
+  <div class="schema-container">
+    <svg viewBox="0 0 1040 540" preserveAspectRatio="xMidYMid meet">
+      <defs><marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><circle cx="3" cy="3" r="1.5" fill="#475569"/></marker></defs>
+      <line x1="520" y1="270" x2="140" y2="80"  stroke="#6366f144" stroke-width="1.5"/>
+      <line x1="520" y1="270" x2="520" y2="50"  stroke="#f59e0b44" stroke-width="1.5"/>
+      <line x1="520" y1="270" x2="900" y2="80"  stroke="#10b98144" stroke-width="1.5"/>
+      <line x1="520" y1="270" x2="980" y2="270" stroke="#ec489944" stroke-width="1.5"/>
+      <line x1="520" y1="270" x2="900" y2="460" stroke="#3b82f644" stroke-width="1.5"/>
+      <line x1="520" y1="270" x2="680" y2="500" stroke="#14b8a644" stroke-width="1.5"/>
+      <line x1="520" y1="270" x2="360" y2="500" stroke="#a78bfa44" stroke-width="1.5"/>
+      <line x1="520" y1="270" x2="140" y2="460" stroke="#4ade8044" stroke-width="1.5"/>
+      <line x1="520" y1="270" x2="60"  y2="270" stroke="#fb923c44" stroke-width="1.5"/>
+      <line x1="520" y1="270" x2="360" y2="80"  stroke="#60a5fa44" stroke-width="1.5"/>
+      <circle cx="520" cy="270" r="200" stroke="#ffffff06" stroke-width="1" fill="none" stroke-dasharray="6 4"/>
+    </svg>
+    <!-- Centre -->
+    <div class="snode" style="left:50%;top:50%;"><div class="snode-center"><span>👤</span><small>Jérôme</small></div></div>
+    <!-- 1 Infrastructure -->
+    <div class="snode" style="left:13%;top:15%;"><a href="#infra" class="domain-node d1"><span class="ico">🖥️</span><span class="lbl">Infrastructure<br/>Tech</span></a><div class="sub-tags"><span class="dtag d1t">Tour · Pi · Laptop</span><span class="dtag d1t">Nextcloud · KDrive</span></div></div>
+    <!-- 2 OpenClaw -->
+    <div class="snode" style="left:50%;top:9%;"><a href="#openclaw" class="domain-node d2"><span class="ico">🦞</span><span class="lbl">OpenClaw<br/>Automation</span></a><div class="sub-tags"><span class="dtag d2t">Telegram · Claude API</span><span class="dtag d2t">26+ automatisations</span></div></div>
+    <!-- 3 Finance & Projets -->
+    <div class="snode" style="left:87%;top:15%;"><a href="#projets" class="domain-node d3"><span class="ico">💰</span><span class="lbl">Finance<br/>& Projets</span></a><div class="sub-tags"><span class="dtag d3t">WattSavoir · aides</span><span class="dtag d3t">APEX · jeromesuider.fr</span></div></div>
+    <!-- 4 Création -->
+    <div class="snode" style="left:94%;top:50%;"><a href="#video" class="domain-node d4"><span class="ico">🎬</span><span class="lbl">Création<br/>& Revenus</span></a><div class="sub-tags"><span class="dtag d4t">YouTube · TikTok</span><span class="dtag d4t">Formations · Affil.</span></div></div>
+    <!-- 5 Personal Branding -->
+    <div class="snode" style="left:87%;top:85%;"><a href="#branding" class="domain-node d5"><span class="ico">✨</span><span class="lbl">Personal<br/>Branding</span></a><div class="sub-tags"><span class="dtag d5t">Public · Privé</span><span class="dtag d5t">jeromesuider.fr</span></div></div>
+    <!-- 6 Créativité -->
+    <div class="snode" style="left:65%;top:93%;"><a href="#creativite" class="domain-node d6"><span class="ico">🎨</span><span class="lbl">Créativité<br/>& Expression</span></a><div class="sub-tags"><span class="dtag d6t">Écriture · Photo</span><span class="dtag d6t">Exploration</span></div></div>
+    <!-- 7 Bien-être -->
+    <div class="snode" style="left:35%;top:93%;"><a href="#sante" class="domain-node d7"><span class="ico">💜</span><span class="lbl">Santé &<br/>Bien-être</span></a><div class="sub-tags"><span class="dtag d7t">Sport · APEX</span><span class="dtag d7t">Douceur · Sommeil</span></div></div>
+    <!-- 8 Social -->
+    <div class="snode" style="left:13%;top:85%;"><a href="#social" class="domain-node d8"><span class="ico">🤝</span><span class="lbl">Social<br/>& Famille</span></a><div class="sub-tags"><span class="dtag d8t">Maman · Amis</span><span class="dtag d8t">CRM · Réseau</span></div></div>
+    <!-- 9 Éco -->
+    <div class="snode" style="left:6%;top:50%;"><a href="#eco" class="domain-node d9"><span class="ico">🌱</span><span class="lbl">Éco-<br/>Responsabilité</span></a><div class="sub-tags"><span class="dtag d9t">WattSavoir</span><span class="dtag d9t">Consommation</span></div></div>
+    <!-- 10 Citoyenneté -->
+    <div class="snode" style="left:35%;top:15%;"><a href="#citoyennete" class="domain-node d10"><span class="ico">🗳️</span><span class="lbl">Citoyenneté<br/>& Culture</span></a><div class="sub-tags"><span class="dtag d10t">Vote · Engagement</span><span class="dtag d10t">Lectures · Loisirs</span></div></div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+
+<!-- 1. Infrastructure -->
+<div id="infra" class="section">
+  <div class="section-header open" onclick="toggle(this)">
+    <div class="num" style="background:#6366f1;">1</div>
+    <span class="emoji">🖥️</span>
+    <h2>Infrastructure Matérielle</h2>
+    <span class="status s-ready">🟢 Prêt à installer</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body open">
+    <div class="devices" style="margin-bottom:12px;">
+      <div class="device">
+        <div class="ico">🗼</div>
+        <div class="role" style="color:#f472b6;">Serveur IA & Automation</div>
+        <h3>Tour (toujours allumée)</h3>
+        <p>OpenClaw · Agent Claude · Pipeline vidéo · Tâches 24/7</p>
+      </div>
+      <div class="device">
+        <div class="ico">🍓</div>
+        <div class="role" style="color:#818cf8;">Serveur Services & Fichiers</div>
+        <h3>Raspberry Pi</h3>
+        <p>Yunohost · Nextcloud · FreshRSS · Vikunja · Vaultwarden · Sites web</p>
+      </div>
+      <div class="device">
+        <div class="ico">💻</div>
+        <div class="role" style="color:#38bdf8;">Usage Quotidien</div>
+        <h3>Laptop</h3>
+        <p>Travail · Synchro Nextcloud · Telegram · Notion</p>
+      </div>
+    </div>
+    <div class="grid g5">
+      <div class="card"><h3 style="color:#38bdf8;">💾 HDD 1 — 2 To</h3><div class="tags"><span class="tag tb">Données primaires</span><span class="tag tb">Nextcloud data</span></div></div>
+      <div class="card"><h3 style="color:#38bdf8;">💾 HDD 2 — 2 To</h3><div class="tags"><span class="tag tb">Backup local</span><span class="tag tb">rsync nightly</span></div></div>
+      <div class="card"><h3 style="color:#38bdf8;">🔌 USB 128 Go</h3><div class="tags"><span class="tag tb">Portable</span><span class="tag tb">Hors-ligne</span></div></div>
+      <div class="card"><h3 style="color:#34d399;">☁️ KDrive 3 To 🇨🇭</h3><div class="tags"><span class="tag tg">Backup offsite</span><span class="tag tg">Infomaniak</span></div></div>
+      <div class="card"><h3 style="color:#34d399;">🔐 Proton Drive</h3><div class="tags"><span class="tag tg">Docs sensibles</span><span class="tag tg">E2E</span></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 2. Services Pi -->
+<div id="services" class="section">
+  <div class="section-header" onclick="toggle(this)">
+    <div class="num" style="background:#818cf8;">2</div>
+    <span class="emoji">🍓</span>
+    <h2>Services Raspberry Pi — Yunohost</h2>
+    <span class="status s-ready">🟢 Prêt à installer</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body">
+    <div class="grid g3">
+      <div class="card"><h3 style="color:#818cf8;">☁️ Nextcloud</h3><div class="tags"><span class="tag tp">Fichiers</span><span class="tag tp">Calendrier</span><span class="tag tp">Contacts</span><span class="tag tp">/Impression</span></div><p>Hub central des fichiers. Accessible via cloud.jeromesuider.fr</p></div>
+      <div class="card"><h3 style="color:#818cf8;">📰 FreshRSS</h3><div class="tags"><span class="tag tp">Veille auto</span><span class="tag tp">API REST</span></div><p>Agrège l'actu. OpenClaw résume chaque matin + alimente le pipeline vidéo.</p></div>
+      <div class="card"><h3 style="color:#818cf8;">✅ Vikunja</h3><div class="tags"><span class="tag tp">Tâches</span><span class="tag tp">Projets</span><span class="tag tp">Deadlines</span></div><p>Gestionnaire open-source, connecté à OpenClaw et Notion.</p></div>
+      <div class="card"><h3 style="color:#818cf8;">🔑 Vaultwarden</h3><div class="tags"><span class="tag tp">Mots de passe</span><span class="tag tp">Bitwarden-compatible</span></div><p>Zéro GAFAM. Remplace 1Password/LastPass.</p></div>
+      <div class="card"><h3 style="color:#818cf8;">🧮 Gitea</h3><div class="tags"><span class="tag tp">Code perso</span><span class="tag tp">CI/CD → Vercel</span></div><p>Dépôts privés souverains. Alternative GitHub.</p></div>
+      <div class="card"><h3 style="color:#818cf8;">🔧 Monitoring</h3><div class="tags"><span class="tag tp">Uptime</span><span class="tag tp">Alertes</span></div><p>Surveillance des services et sites web. Alerte vers Telegram si panne.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- 3. OpenClaw -->
+<div id="openclaw" class="section">
+  <div class="section-header" onclick="toggle(this)">
+    <div class="num" style="background:#f59e0b;">3</div>
+    <span class="emoji">🦞</span>
+    <h2>OpenClaw — Agent IA (sur la Tour)</h2>
+    <span class="status s-soon">🔵 Prochaine étape</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body">
+    <div class="grid g2" style="margin-bottom:12px;">
+      <div class="card">
+        <h3 style="color:#fbbf24;">🦞 OpenClaw</h3>
+        <div class="tags"><span class="tag to">24/7 systemd</span><span class="tag to">Python 3.11</span><span class="tag to">Claude API</span><span class="tag to">open-source</span><span class="tag to">openclaw.ai</span></div>
+        <p>Gateway entre Telegram et Claude API. Mémoire persistante dans SOUL.md, IDENTITY.md, USER.md — personnalisée à ton profil, tes projets, tes habitudes.</p>
+        <div class="sub">Coût estimé</div>
+        <div class="tags"><span class="tag to">Haiku : ~3-7€/mois</span><span class="tag to">Sonnet : ~10-20€/mois</span><span class="tag to">Mix recommandé : ~5-10€/mois</span></div>
+        <div class="sub">Installation</div>
+        <p>Guide complet 9 étapes dans Notion : BotFather → API Key → Python venv → .env → bot.py → systemd → Docker optionnel</p>
+      </div>
+      <div class="card">
+        <h3 style="color:#fbbf24;">📱 Telegram Bot</h3>
+        <div class="tags"><span class="tag to">Langage naturel</span><span class="tag to">Pocket remote</span><span class="tag to">Conversation history</span></div>
+        <p>Tu envoies un message depuis n'importe où — OpenClaw comprend, agit, répond.</p>
+        <div class="sub">Outils connectés</div>
+        <div class="tags"><span class="tag to">Nextcloud</span><span class="tag to">Google Calendar</span><span class="tag to">Notion</span><span class="tag to">FreshRSS</span><span class="tag to">Email IMAP</span><span class="tag to">Vikunja</span><span class="tag to">YouTube API</span><span class="tag to">TikTok API</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 4. Automatisations -->
+<div id="auto" class="section">
+  <div class="section-header" onclick="toggle(this)">
+    <div class="num" style="background:#f59e0b;">4</div>
+    <span class="emoji">🤖</span>
+    <h2>Domaines Automatisés</h2>
+    <span class="status s-soon">🔵 Connecter progressivement</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body">
+    <div class="auto-grid">
+      <div class="auto-item"><div class="auto-icon">📰</div><div class="auto-body"><h4>Veille & Information</h4><p>FreshRSS → résumé quotidien dans Telegram. Sujets tendance pour le pipeline vidéo.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">📅</div><div class="auto-body"><h4>Agenda & Planning</h4><p>Résumé de semaine chaque lundi, rappels de RDV, suggestions d'organisation.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">📧</div><div class="auto-body"><h4>Emails</h4><p>Résumé des mails importants, détection des deadlines, draft de réponses.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">🛒</div><div class="auto-body"><h4>Courses & Logistique</h4><p>"J'ai plus de café" → ajout liste Nextcloud. Organisée par rayon/magasin.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">📋</div><div class="auto-body"><h4>Démarches Administratives</h4><p>Suivi dossiers (ADIL, aides…), rappels d'échéances, préparation documents.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">💰</div><div class="auto-body"><h4>Finance Personnelle</h4><p>Suivi dépenses, alertes abonnements, résumé mensuel, rappels de paiement.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">🚀</div><div class="auto-body"><h4>Suivi Projets Long Terme</h4><p>Jalons, revues hebdo, KPIs dans Notion. Point mensuel consolidé.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">🌐</div><div class="auto-body"><h4>Monitoring Sites Web</h4><p>Uptime de jeromesuider.fr, WattSavoir, calculer-mes-aides, APEX. Alerte si chute.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">🤝</div><div class="auto-body"><h4>Entrepreneuriat & Réseau</h4><p>Suivi prospects, relances, briefs avant réunions, démarche commerciale.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">⚡</div><div class="auto-body"><h4>Énergie (WattSavoir)</h4><p>Suivi conso, alertes heures creuses, recommandations économies.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">💸</div><div class="auto-body"><h4>Budget Projets & Rentabilité</h4><p>Coûts API, hébergement, domaines vs revenus. Vue P&L dans Notion.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">🌦️</div><div class="auto-body"><h4>Météo Intelligente</h4><p>Sport/RDV extérieur → vérification météo veille + alerte si conditions difficiles.</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 5. Rituels -->
+<div id="rituels" class="section">
+  <div class="section-header" onclick="toggle(this)">
+    <div class="num" style="background:#14b8a6;">5</div>
+    <span class="emoji">🧘</span>
+    <h2>Rituels & Systèmes Personnels</h2>
+    <span class="status s-soon">🔵 Configurer dans USER.md</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body">
+    <div class="auto-grid">
+      <div class="auto-item"><div class="auto-icon">🌅</div><div class="auto-body"><h4>Rituel Matinal</h4><p>Chaque matin : météo, intention du jour, 3 priorités, fait issu de la veille. Envoyé dans Telegram.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">🎙️</div><div class="auto-body"><h4>Second Cerveau Vocal</h4><p>Tu dictes une idée → OpenClaw transcrit, catégorise, envoie dans la bonne page Notion.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">📆</div><div class="auto-body"><h4>Revue Hebdomadaire (dimanche soir)</h4><p>Accompli, en retard, vidéos publiées, abonnés, suggestion de focus.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">📖</div><div class="auto-body"><h4>Revue Mensuelle</h4><p>Point global sur tous les projets, finances, santé, relations. Vision long terme.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">🗄️</div><div class="auto-body"><h4>Archive Conversations Clés</h4><p>Échanges Telegram importants archivés dans Notion (décisions, idées, démarches).</p></div></div>
+      <div class="auto-item"><div class="auto-icon">📍</div><div class="auto-body"><h4>Exploration Quotidienne</h4><p>OpenClaw propose chaque jour une micro-action hors zone de confort.</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 6. Pipeline Vidéo -->
+<div id="video" class="section">
+  <div class="section-header" onclick="toggle(this)">
+    <div class="num" style="background:#ec4899;">6</div>
+    <span class="emoji">🎬</span>
+    <h2>Pipeline Vidéo Automatisé</h2>
+    <span class="status s-later">🟣 Phase 2</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body">
+    <div class="grid g2" style="margin-bottom:12px;">
+      <div class="card"><h3 style="color:#f472b6;">🎯 Thématiques Piliers</h3><div class="tags"><span class="tag tk">🤖 IA & Outils</span><span class="tag tk">⚡ Énergie & Économies</span><span class="tag tk">🧮 Aides & Droits</span><span class="tag tk">🔒 Indépendance numérique</span></div><p>4 piliers cohérents, éducatifs. Format 1-2 min. Voix IA. 100% automatisé.</p></div>
+      <div class="card"><h3 style="color:#f472b6;">🛠️ Stack Technique</h3><div class="tags"><span class="tag tk">Claude API → Script</span><span class="tag tk">ElevenLabs / Coqui TTS</span><span class="tag tk">ffmpeg</span><span class="tag tk">Pexels API</span><span class="tag tk">YouTube API</span><span class="tag tk">TikTok API</span></div><p>Tourne sur la tour. OpenClaw orchestre de bout en bout.</p></div>
+    </div>
+    <div class="flow-row">
+      <div class="fbox" style="border-color:#ec489944;color:#f472b6;">📰 FreshRSS<br/>Sujet</div><div class="farr">→</div>
+      <div class="fbox" style="border-color:#ec489944;color:#f472b6;">🧠 Claude<br/>Script</div><div class="farr">→</div>
+      <div class="fbox" style="border-color:#ec489944;color:#f472b6;">🎙️ TTS<br/>Voix IA</div><div class="farr">→</div>
+      <div class="fbox" style="border-color:#ec489944;color:#f472b6;">🎬 ffmpeg<br/>Montage</div><div class="farr">→</div>
+      <div class="fbox" style="border-color:#ec489944;color:#f472b6;">📤 YouTube<br/>TikTok</div><div class="farr">→</div>
+      <div class="fbox" style="border-color:#ec489944;color:#f472b6;">📊 Notion<br/>Analytics</div>
+    </div>
+  </div>
+</div>
+
+<!-- 7. Monétisation -->
+<div id="mono" class="section">
+  <div class="section-header" onclick="toggle(this)">
+    <div class="num" style="background:#f59e0b;">7</div>
+    <span class="emoji">💰</span>
+    <h2>Stratégie de Monétisation</h2>
+    <span class="status s-later">🟣 Progressif</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body">
+    <div class="mono-grid">
+      <div class="mono-card" style="border-color:#38bdf844;"><div class="phase" style="color:#38bdf8;">Phase 1 · 0-6 mois</div><h4 style="color:#38bdf8;">Revenus Directs</h4><p>YouTube AdSense (1000 subs + 4000h). TikTok Creator Fund (10k). Liens d'affiliation dès le départ. Lead gen via calculer-mes-aides.fr.</p></div>
+      <div class="mono-card" style="border-color:#fbbf2444;"><div class="phase" style="color:#fbbf24;">Phase 2 · 6-12 mois</div><h4 style="color:#fbbf24;">Base & Affiliation</h4><p>Newsletter auto (Ghost). Affiliation tech & IA. Trafic croisé vers WattSavoir et calculer-mes-aides.</p></div>
+      <div class="mono-card" style="border-color:#a5b4fc44;"><div class="phase" style="color:#a5b4fc;">Phase 3 · 12 mois+</div><h4 style="color:#a5b4fc;">Formations & Sponsoring</h4><p>Formations digitales (Gumroad). Sponsoring aligné. Produits numériques passifs. Freemium APEX.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- 8. Projets Web -->
+<div id="projets" class="section">
+  <div class="section-header open" onclick="toggle(this)">
+    <div class="num" style="background:#10b981;">8</div>
+    <span class="emoji">🚀</span>
+    <h2>Projets Web — 7 projets actifs</h2>
+    <span class="status s-ongoing">🟡 En cours</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body open">
+    <div class="grid g2" style="margin-bottom:10px;">
+      <!-- APEX -->
+      <div class="card">
+        <h3 style="color:#10b981;">💪 APEX — Programme Sport</h3>
+        <div class="tags"><span class="tag tg">✅ Live</span><span class="tag tg">Next.js 15</span><span class="tag tg">React 19</span><span class="tag tg">Supabase</span><span class="tag tg">Tailwind CSS</span><span class="tag tg">Vercel</span></div>
+        <p>App complète de suivi musculation. Programmes personnalisés (V-Taper), suivi de progression des charges, interface PWA.</p>
+        <div class="sub">Liens</div>
+        <p><strong>Live :</strong> programme-sport.vercel.app · <strong>Repo :</strong> github.com/jerorome/programme-sport · <strong>Auth :</strong> Google OAuth + Magic Link</p>
+      </div>
+      <!-- jeromesuider.fr -->
+      <div class="card">
+        <h3 style="color:#10b981;">🌐 jeromesuider.fr — Site Personnel</h3>
+        <div class="tags"><span class="tag tg">🔧 En cours</span><span class="tag tg">Next.js</span><span class="tag tg">Sanity CMS</span><span class="tag tg">Tailwind</span><span class="tag tg">Vercel</span></div>
+        <p>Site personnel dark mode (inspiré pizzint.watch). Sections : Écrire, Capturer, Partager, Projets, Carnet. CMS Sanity (ID: cce3ohlb).</p>
+        <div class="sub">Design</div>
+        <p>Typo : Space Grotesk + Newsreader + JetBrains Mono · Email : bonjour@jeromesuider.fr · Domaine : OVH</p>
+      </div>
+    </div>
+    <div class="grid g3">
+      <!-- WattSavoir -->
+      <div class="card">
+        <h3 style="color:#10b981;">⚡ WattSavoir</h3>
+        <div class="tags"><span class="tag tg">✅ Live</span><span class="tag tg">Next.js 14</span><span class="tag tg">Netlify</span><span class="tag tg">Static</span></div>
+        <p>FAQ énergie avec 9 outils interactifs : diagnostic, estimateur, comparateur 11 fournisseurs, simulateur solaire/aides/isolation/chauffe-eau, décodeur facture, glossaire.</p>
+        <div class="sub">Design</div>
+        <p>Navy / cuivre / lin · Libre Baskerville + Nunito</p>
+      </div>
+      <!-- calculer-mes-aides.fr -->
+      <div class="card">
+        <h3 style="color:#10b981;">🧮 calculer-mes-aides.fr</h3>
+        <div class="tags"><span class="tag tg">✅ Live</span><span class="tag tg">WordPress 5.9.2</span><span class="tag tg">Hestia</span></div>
+        <p>Simulateur aides rénovation énergétique. Filiale d'Estimeco. Business model : lead generation.</p>
+      </div>
+      <!-- OpenClaw -->
+      <div class="card">
+        <h3 style="color:#fbbf24;">🦞 OpenClaw</h3>
+        <div class="tags"><span class="tag to">🔧 En cours</span><span class="tag to">Python 3.11</span><span class="tag to">Claude API</span><span class="tag to">Telegram</span></div>
+        <p>Bot IA personnel. Hébergé sur la tour (pas le Pi). Service systemd 24/7. Guide d'installation complet dans Notion.</p>
+      </div>
+    </div>
+    <div class="grid g2" style="margin-top:10px;">
+      <!-- Notion Hub -->
+      <div class="card">
+        <h3 style="color:#818cf8;">🗒️ Notion Hub — Écosystème</h3>
+        <div class="tags"><span class="tag tp">✅ Live</span><span class="tag tp">14 pages</span><span class="tag tp">1 base de données</span><span class="tag tp">Liens croisés</span></div>
+        <p>Dashboard global dans Notion avec pages pour chaque projet et domaine de vie. Base de données "Projets & Services" avec 14 entrées.</p>
+      </div>
+      <!-- Vidéo Pipeline -->
+      <div class="card">
+        <h3 style="color:#f472b6;">🎬 Pipeline Vidéo</h3>
+        <div class="tags"><span class="tag tk">💡 Idée</span><span class="tag tk">YouTube</span><span class="tag tk">TikTok</span><span class="tag tk">100% automatisé</span></div>
+        <p>Création vidéo automatisée : FreshRSS → Claude Script → TTS → ffmpeg → publication. Tourne sur la tour via OpenClaw.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 9. Notion -->
+<div id="notion" class="section">
+  <div class="section-header" onclick="toggle(this)">
+    <div class="num" style="background:#94a3b8;">9</div>
+    <span class="emoji">🗒️</span>
+    <h2>Notion — Tableau de Bord Global</h2>
+    <span class="status s-live">✅ Live — 14 pages + 1 DB</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body">
+    <div class="notion-grid">
+      <div class="np"><span class="ico">🌐</span>Hub Écosystème<span class="lbl">Page principale</span></div>
+      <div class="np"><span class="ico">💪</span>APEX<span class="lbl">App sport</span></div>
+      <div class="np"><span class="ico">🦞</span>OpenClaw<span class="lbl">Guide install</span></div>
+      <div class="np"><span class="ico">🍓</span>Raspberry Pi<span class="lbl">Services Pi</span></div>
+      <div class="np"><span class="ico">💾</span>Stockage<span class="lbl">Backup 3-2-1</span></div>
+      <div class="np"><span class="ico">🎬</span>Vidéo Pipeline<span class="lbl">Création auto</span></div>
+      <div class="np"><span class="ico">💰</span>Monétisation<span class="lbl">3 phases</span></div>
+      <div class="np"><span class="ico">🏠</span>Logement<span class="lbl">ADIL · Aides</span></div>
+      <div class="np"><span class="ico">💜</span>Santé<span class="lbl">Bien-être</span></div>
+      <div class="np"><span class="ico">🎨</span>Créativité<span class="lbl">Expression</span></div>
+      <div class="np"><span class="ico">⏰</span>Rituels<span class="lbl">Automations</span></div>
+      <div class="np"><span class="ico">📋</span>Roadmap<span class="lbl">Vision</span></div>
+      <div class="np"><span class="ico">⚡</span>WattSavoir<span class="lbl">FAQ énergie</span></div>
+      <div class="np"><span class="ico">🌐</span>jeromesuider.fr<span class="lbl">Site perso</span></div>
+      <div class="np"><span class="ico">🧮</span>calculer-mes-aides<span class="lbl">Simulateur</span></div>
+    </div>
+    <p style="font-size:0.72rem;color:#475569;margin-top:12px;text-align:center;">+ Base de données "Tableau de bord — Projets & Services" (14 entrées avec statut, priorité, stack, URLs, prochaine action)</p>
+  </div>
+</div>
+
+<!-- 10. Backup -->
+<div id="backup" class="section">
+  <div class="section-header" onclick="toggle(this)">
+    <div class="num" style="background:#10b981;">10</div>
+    <span class="emoji">🛡️</span>
+    <h2>Sauvegarde — Règle 3-2-1</h2>
+    <span class="status s-ready">🟢 Simple à mettre en place</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body">
+    <div class="backup-row">
+      <div class="bnode" style="border-color:#6366f144;color:#818cf8;">🍓 HDD 1<br/>Primaire<br/><small style="color:#475569;">Pi · Nextcloud</small></div>
+      <div class="barr">→</div>
+      <div class="bnode" style="border-color:#0ea5e944;color:#38bdf8;">💾 HDD 2<br/>Local<br/><small style="color:#475569;">rsync · nightly</small></div>
+      <div class="barr">→</div>
+      <div class="bnode" style="border-color:#10b98144;color:#34d399;">☁️ KDrive 🇨🇭<br/>Offsite<br/><small style="color:#475569;">rclone · hebdo</small></div>
+    </div>
+    <p style="text-align:center;font-size:0.73rem;color:#475569;margin-top:10px;">+ Proton Drive pour les documents sensibles — chiffrement zero-knowledge</p>
+  </div>
+</div>
+
+<!-- 11. Comptes & Accès -->
+<div id="comptes" class="section">
+  <div class="section-header" onclick="toggle(this)">
+    <div class="num" style="background:#6366f1;">11</div>
+    <span class="emoji">🔐</span>
+    <h2>Comptes & Accès — 10 services</h2>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body">
+    <table class="acc-table">
+      <thead><tr><th>Service</th><th>Identifiant</th><th>Usage</th></tr></thead>
+      <tbody>
+        <tr><td class="acc-name">Proton Mail</td><td>jeromee@pm.me</td><td>Email principal, Proton Drive</td></tr>
+        <tr><td class="acc-name">Google</td><td>jusdorangepascher@gmail.com</td><td>Calendar, OAuth APEX</td></tr>
+        <tr><td class="acc-name">GitHub</td><td>jerorome</td><td>Repos publics (programme-sport…)</td></tr>
+        <tr><td class="acc-name">OVH</td><td>bonjour@jeromesuider.fr</td><td>Domaines (jeromesuider.fr…)</td></tr>
+        <tr><td class="acc-name">Vercel</td><td>—</td><td>APEX + jeromesuider.fr</td></tr>
+        <tr><td class="acc-name">Sanity</td><td>Projet cce3ohlb</td><td>CMS jeromesuider.fr</td></tr>
+        <tr><td class="acc-name">Supabase</td><td>—</td><td>Auth + DB APEX</td></tr>
+        <tr><td class="acc-name">Infomaniak</td><td>—</td><td>KDrive 3 To (backup offsite)</td></tr>
+        <tr><td class="acc-name">Netlify</td><td>—</td><td>WattSavoir (static export)</td></tr>
+        <tr><td class="acc-name">Anthropic</td><td>—</td><td>Claude API pour OpenClaw</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 12. Santé -->
+<div id="sante" class="section">
+  <div class="section-header" onclick="toggle(this)">
+    <div class="num" style="background:#7c3aed;">12</div>
+    <span class="emoji">💜</span>
+    <h2>Santé & Bien-être</h2>
+    <span class="status s-ongoing">🟡 En cours</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body">
+    <div class="soft-card" style="margin-bottom:12px;">
+      <p>La santé et le bien-être ne sont pas des domaines de performance. Ils sont des espaces de présence. Tout ce qui est ici l'est pour avoir une trace douce, pas pour créer de la pression.</p>
+    </div>
+    <div class="auto-grid">
+      <div class="auto-item"><div class="auto-icon">🧠</div><div class="auto-body"><h4>Psychanalyse & Santé Mentale</h4><p>RDV réguliers. Espace de notes privé dans Notion (chiffré). Suivi de l'humeur via Telegram si désiré.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">💪</div><div class="auto-body"><h4>Musculation (APEX)</h4><p>Log des séances et progression via APEX (programme-sport.vercel.app). OpenClaw adapte selon la récupération et le sommeil.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">😴</div><div class="auto-body"><h4>Sommeil</h4><p>Log des heures via Telegram. Corrélation avec performance et humeur.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">🥗</div><div class="auto-body"><h4>Nutrition & Repas</h4><p>Suggestions autour des séances de sport. Sans tracking obsessionnel.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">🏥</div><div class="auto-body"><h4>Suivi Médical</h4><p>Rappels de visites annuelles. Ordonnances et résultats dans Proton Drive.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">🌬️</div><div class="auto-body"><h4>Gestion du Stress</h4><p>OpenClaw détecte les semaines surchargées et propose de libérer du temps.</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 13. Douceur -->
+<div id="douceur" class="section">
+  <div class="section-header" onclick="toggle(this)">
+    <div class="num" style="background:#0d9488;">13</div>
+    <span class="emoji">🌿</span>
+    <h2>Espace de Douceur — Méditation · Journaling · Lecture</h2>
+    <span class="status s-ongoing">🟡 En cours</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body">
+    <div class="soft-card" style="margin-bottom:12px;">
+      <p>Cet espace n'est pas fait pour être performé. Méditer, écrire dans un journal, lire — c'est simplement exister. OpenClaw peut en garder une trace légère, sans pression.</p>
+    </div>
+    <div class="auto-grid">
+      <div class="auto-item"><div class="auto-icon">🧘</div><div class="auto-body"><h4>Méditation</h4><p>Log optionnel via Telegram. Pas de streak, pas de durée imposée.</p><span class="soft-badge">Sans pression</span></div></div>
+      <div class="auto-item"><div class="auto-icon">📓</div><div class="auto-body"><h4>Journaling</h4><p>Espace privé dans Notion. Peut alimenter la section "Écrire" de jeromesuider.fr (Journal, Gratitudes).</p><span class="soft-badge">Espace privé</span></div></div>
+      <div class="auto-item"><div class="auto-icon">📖</div><div class="auto-body"><h4>Lecture</h4><p>Liste "En cours / Lu" dans Notion. Citations vers la section "Capturer" de jeromesuider.fr.</p><span class="soft-badge">À ton rythme</span></div></div>
+      <div class="auto-item"><div class="auto-icon">🌊</div><div class="auto-body"><h4>Moments de Pause</h4><p>Si journée surchargée → OpenClaw rappelle doucement de souffler, marcher, se déconnecter.</p><span class="soft-badge">Douceur</span></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 14. Social -->
+<div id="social" class="section">
+  <div class="section-header" onclick="toggle(this)">
+    <div class="num" style="background:#0284c7;">14</div>
+    <span class="emoji">🤝</span>
+    <h2>Vie Sociale & Famille</h2>
+    <span class="status s-ongoing">🟡 En cours</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body">
+    <div class="auto-grid">
+      <div class="auto-item"><div class="auto-icon">👩‍👦</div><div class="auto-body"><h4>Famille (Maman & Proches)</h4><p>RDV réguliers dans l'agenda. Rappel de prendre des nouvelles. Dates anniversaires auto.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">👥</div><div class="auto-body"><h4>Mini-CRM Amis & Réseau</h4><p>Qui tu as vu, quand, quoi de neuf. Suggestion de recontact si +30 jours.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">🤝</div><div class="auto-body"><h4>Réseau Professionnel</h4><p>Suivi des contacts clés, relances, préparation avant un échange important.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">🎉</div><div class="auto-body"><h4>Événements Sociaux</h4><p>Sorties, invitations dans l'agenda. OpenClaw équilibre les semaines.</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 15. Logement -->
+<div id="logement" class="section">
+  <div class="section-header" onclick="toggle(this)">
+    <div class="num" style="background:#0369a1;">15</div>
+    <span class="emoji">🏠</span>
+    <h2>Logement & Démarches Administratives</h2>
+    <span class="status s-ongoing">🟡 En cours (ADIL)</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body">
+    <div class="auto-grid">
+      <div class="auto-item"><div class="auto-icon">🏢</div><div class="auto-body"><h4>Dossier Logement</h4><p>Suivi ADIL et suites. Documents dans Nextcloud / Proton Drive. Rappels automatiques.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">📑</div><div class="auto-body"><h4>Aides & Droits</h4><p>Lié à calculer-mes-aides.fr. OpenClaw vérifie les nouvelles aides selon ta situation.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">📬</div><div class="auto-body"><h4>Courrier & Documents</h4><p>Numérisation et archivage dans Nextcloud /Admin. Rappels de délais légaux.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">🔑</div><div class="auto-body"><h4>Contrats & Abonnements</h4><p>Suivi des contrats (loyer, assurances, abonnements). Alertes de renouvellement.</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 16. Culture -->
+<div id="culture" class="section">
+  <div class="section-header" onclick="toggle(this)">
+    <div class="num" style="background:#b45309;">16</div>
+    <span class="emoji">🎭</span>
+    <h2>Culture, Loisirs & Apprentissage</h2>
+    <span class="status s-ongoing">🟡 En cours</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body">
+    <div class="auto-grid">
+      <div class="auto-item"><div class="auto-icon">🎬</div><div class="auto-body"><h4>Films, Séries & Musique</h4><p>Liste "À voir / À écouter" dans Notion. Suggestions via OpenClaw.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">🧑‍💻</div><div class="auto-body"><h4>Formation Continue</h4><p>Suivi des cours, certifications. OpenClaw alloue des créneaux dans ton agenda.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">✈️</div><div class="auto-body"><h4>Voyages & Sorties</h4><p>Idées de destinations dans Notion. Préparation automatisée (checklist, météo).</p></div></div>
+      <div class="auto-item"><div class="auto-icon">🎲</div><div class="auto-body"><h4>Loisirs & Découvertes</h4><p>OpenClaw propose sorties, expos, concerts dans ta région.</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 17. Créativité -->
+<div id="creativite" class="section">
+  <div class="section-header" onclick="toggle(this)">
+    <div class="num" style="background:#0d9488;">17</div>
+    <span class="emoji">🎨</span>
+    <h2>Créativité & Expression Personnelle</h2>
+    <span class="status s-ongoing">🟡 En exploration</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body">
+    <div class="soft-card" style="margin-bottom:12px;">
+      <p>La créativité n'est pas un projet à livrer. C'est un espace de liberté, d'exploration, de sortie de la zone de confort. Tout est possible.</p>
+    </div>
+    <div class="auto-grid">
+      <div class="auto-item"><div class="auto-icon">✍️</div><div class="auto-body"><h4>Écriture</h4><p>Drafts dans Nextcloud /Écriture. Publié sur jeromesuider.fr/ecrire (Textes, Journal, Apprentissages, Listes, Gratitudes).</p><span class="soft-badge">Sans jugement</span></div></div>
+      <div class="auto-item"><div class="auto-icon">📷</div><div class="auto-body"><h4>Photographie</h4><p>Albums dans Nextcloud /Photos (numérique + argentique). Publié sur jeromesuider.fr/capturer. L'archive reste souveraine.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">🎭</div><div class="auto-body"><h4>Autres Loisirs Créatifs</h4><p>Dessin, musique, vidéo… Espace dédié dans Notion sans pression.</p><span class="soft-badge">Exploration libre</span></div></div>
+      <div class="auto-item"><div class="auto-icon">🚪</div><div class="auto-body"><h4>Sortir de sa Zone de Confort</h4><p>Chaque semaine, OpenClaw propose une micro-expérience nouvelle.</p><span class="soft-badge">Quotidien</span></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 18. Éco-responsabilité -->
+<div id="eco" class="section">
+  <div class="section-header" onclick="toggle(this)">
+    <div class="num" style="background:#15803d;">18</div>
+    <span class="emoji">🌱</span>
+    <h2>Éco-responsabilité & Engagement Environnemental</h2>
+    <span class="status s-later">🟣 À construire</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body">
+    <div class="auto-grid">
+      <div class="auto-item"><div class="auto-icon">⚡</div><div class="auto-body"><h4>Consommation Énergétique</h4><p>Lié à WattSavoir (9 outils). Suivi conso du foyer, alertes heures creuses, comparaison mensuelle.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">🛒</div><div class="auto-body"><h4>Achats Responsables</h4><p>Suggestions d'alternatives locales ou éco-responsables dans les listes de courses.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">🚲</div><div class="auto-body"><h4>Mobilité Douce</h4><p>Suggestions de trajets à pied, vélo ou transports en commun.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">🌍</div><div class="auto-body"><h4>Actions à Mon Échelle</h4><p>Suivi dans Notion des petits gestes quotidiens. Pas un tableau de performance.</p><span class="soft-badge">À son rythme</span></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 19. Personal Branding -->
+<div id="branding" class="section">
+  <div class="section-header" onclick="toggle(this)">
+    <div class="num" style="background:#1d4ed8;">19</div>
+    <span class="emoji">✨</span>
+    <h2>Personal Branding — Présence en Ligne</h2>
+    <span class="status s-ongoing">🟡 En cours</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body">
+    <div class="pb-split">
+      <div class="pb-public">
+        <div class="pb-label" style="color:#60a5fa;">🌐 Face Publique</div>
+        <div class="tags" style="margin-bottom:10px;"><span class="tag ty">jeromesuider.fr</span><span class="tag ty">YouTube</span><span class="tag ty">TikTok</span><span class="tag ty">LinkedIn</span><span class="tag ty">Instagram</span></div>
+        <p style="font-size:0.75rem;color:#64748b;line-height:1.5;">Ton identité numérique choisie et maîtrisée. jeromesuider.fr comme hub central (Next.js + Sanity CMS). Sections Écrire, Capturer, Partager, Projets, Carnet. OpenClaw aide à programmer et cohérentiser les publications.</p>
+      </div>
+      <div class="pb-private">
+        <div class="pb-label" style="color:#818cf8;">🔒 Face Privée (Notion + OpenClaw)</div>
+        <div class="tags" style="margin-bottom:10px;"><span class="tag tp">14 pages Notion</span><span class="tag tp">Projets en cours</span><span class="tag tp">Finances</span><span class="tag tp">Vie personnelle</span></div>
+        <p style="font-size:0.75rem;color:#64748b;line-height:1.5;">Infrastructure, automatisations, Notion Hub, suivi de vie. Souverain, privé, zéro GAFAM. Ton cerveau externe personnel.</p>
+      </div>
+    </div>
+    <div class="auto-grid" style="margin-top:10px;">
+      <div class="auto-item"><div class="auto-icon">📊</div><div class="auto-body"><h4>Veille E-réputation</h4><p>OpenClaw surveille mentions de jeromesuider.fr et de tes projets.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">🗓️</div><div class="auto-body"><h4>Calendrier Editorial</h4><p>Planning de publication dans Notion. Sujets cohérents avec tes thématiques.</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 20. Citoyenneté -->
+<div id="citoyennete" class="section">
+  <div class="section-header" onclick="toggle(this)">
+    <div class="num" style="background:#1d4ed8;">20</div>
+    <span class="emoji">🗳️</span>
+    <h2>Citoyenneté & Engagement</h2>
+    <span class="status s-ongoing">🟡 En cours</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body">
+    <div class="auto-grid">
+      <div class="auto-item"><div class="auto-icon">🗳️</div><div class="auto-body"><h4>Vie Démocratique</h4><p>Rappels automatiques des échéances électorales, inscriptions, dépouillement.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">🌱</div><div class="auto-body"><h4>Engagement Local</h4><p>Suivi des associations, initiatives locales, événements communautaires.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">📡</div><div class="auto-body"><h4>Veille Société</h4><p>FreshRSS + OpenClaw résument l'actu sur l'IA, l'énergie, les droits, la politique locale.</p></div></div>
+      <div class="auto-item"><div class="auto-icon">💡</div><div class="auto-body"><h4>Contributions Open Source</h4><p>Suivi de tes contributions (Gitea + GitHub). OpenClaw alloue du temps dédié.</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 21. Roadmap -->
+<div id="roadmap" class="section">
+  <div class="section-header open" onclick="toggle(this)">
+    <div class="num" style="background:#6366f1;">21</div>
+    <span class="emoji">📋</span>
+    <h2>Feuille de Route — Progression</h2>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body open">
+    <div class="roadmap">
+      <div class="step"><div class="step-num" style="background:#10b981;">✓</div><div class="step-body"><h4>APEX — Programme Musculation <span class="status s-live">✅ Déployé</span></h4><p>Next.js 15 + React 19 + Supabase + Vercel. Live sur programme-sport.vercel.app. Auth Google OAuth + Magic Link.</p></div></div>
+      <div class="step"><div class="step-num" style="background:#10b981;">✓</div><div class="step-body"><h4>Notion Hub — Écosystème Dashboard <span class="status s-live">✅ Live</span></h4><p>14 pages + 1 base de données. Vue d'ensemble, sections catégorisées, comptes, liens croisés. Guide d'installation OpenClaw complet.</p></div></div>
+      <div class="step"><div class="step-num" style="background:#10b981;">✓</div><div class="step-body"><h4>WattSavoir — FAQ Énergie <span class="status s-live">✅ Live</span></h4><p>Next.js 14 + Netlify. 9 outils interactifs, comparateur 11 fournisseurs. Co-créé avec collègue.</p></div></div>
+      <div class="step"><div class="step-num" style="background:#10b981;">✓</div><div class="step-body"><h4>calculer-mes-aides.fr <span class="status s-live">✅ Live</span></h4><p>WordPress + Hestia. Simulateur aides rénovation. Filiale Estimeco. Business model lead gen.</p></div></div>
+      <div class="step"><div class="step-num" style="background:#6366f1;">5</div><div class="step-body"><h4>jeromesuider.fr — Site personnel <span class="status s-soon">🔵 En cours</span></h4><p>Next.js + Sanity CMS (cce3ohlb) + Tailwind. Dark mode. Sections Écrire/Capturer/Partager/Projets/Carnet. Déploiement Vercel.</p></div></div>
+      <div class="step"><div class="step-num" style="background:#6366f1;">6</div><div class="step-body"><h4>Yunohost + Nextcloud sur le Pi <span class="status s-soon">🔵 ~1h</span></h4><p>Image SD → config initiale → cloud.jeromesuider.fr → SSL → HDD1 → rsync HDD2 nightly</p></div></div>
+      <div class="step"><div class="step-num" style="background:#6366f1;">7</div><div class="step-body"><h4>rclone → KDrive Infomaniak <span class="status s-soon">🔵 ~30 min</span></h4><p>Backup offsite automatique hebdomadaire. Règle 3-2-1 opérationnelle.</p></div></div>
+      <div class="step"><div class="step-num" style="background:#f59e0b;">8</div><div class="step-body"><h4>OpenClaw sur la Tour <span class="status s-ongoing">🟡 ~2h</span></h4><p>Cloner repo → clé Anthropic API → token Telegram → personnaliser USER.md → service systemd. Guide complet dans Notion.</p></div></div>
+      <div class="step"><div class="step-num" style="background:#f59e0b;">9</div><div class="step-body"><h4>Connecter les outils à OpenClaw <span class="status s-later">🟣 Itératif</span></h4><p>Google Calendar → Nextcloud (WebDAV) → Email (IMAP) → FreshRSS API → Vikunja API</p></div></div>
+      <div class="step"><div class="step-num" style="background:#f59e0b;">10</div><div class="step-body"><h4>Services Pi additionnels <span class="status s-later">🟣 Yunohost</span></h4><p>FreshRSS, Vikunja, Vaultwarden, Gitea → connecter à OpenClaw</p></div></div>
+      <div class="step"><div class="step-num" style="background:#ec4899;">11</div><div class="step-body"><h4>Pipeline vidéo automatisé <span class="status s-later">🟣 ~1 semaine</span></h4><p>Claude → TTS → ffmpeg → YouTube API + TikTok API → analytics dans Notion</p></div></div>
+      <div class="step"><div class="step-num" style="background:#ec4899;">12</div><div class="step-body"><h4>Monétisation & Formations <span class="status s-later">🟣 6-12 mois</span></h4><p>Newsletter auto, affiliations, formations digitales, freemium APEX</p></div></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<p style="text-align:center;font-size:0.7rem;color:#1e2538;padding:20px 0 40px;">Zéro GAFAM · Souveraineté totale · openclaw.ai · jeromesuider.fr · wattsavoir.fr · calculer-mes-aides.fr · Mars 2026</p>
+
+<script>
+function toggle(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+// Nav active highlight on scroll
+const sections = document.querySelectorAll('[id]');
+const navLinks = document.querySelectorAll('.nav a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 80) current = s.id;
+  });
+  navLinks.forEach(a => {
+    a.classList.remove('active');
+    if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>

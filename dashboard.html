@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ecosysteme Jerome</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,system-ui,'Segoe UI',sans-serif;background:#0a0e1a;color:#f1f5f9;min-height:100vh}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 0%,rgba(99,102,241,.08) 0%,transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(139,92,246,.06) 0%,transparent 50%);pointer-events:none}
+
+/* HEADER */
+.hdr{position:sticky;top:0;z-index:50;background:rgba(10,14,26,.88);backdrop-filter:blur(20px);border-bottom:1px solid rgba(71,85,105,.3)}
+.hdr-in{max-width:1400px;margin:0 auto;padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-i{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:15px}
+.logo span{font-weight:700;font-size:1rem;letter-spacing:-.01em}
+.nav{display:flex;gap:2px}
+.nb{display:flex;align-items:center;gap:6px;padding:7px 13px;background:none;border:none;border-radius:9px;color:#64748b;font-size:.82rem;font-weight:500;cursor:pointer;transition:all .18s;font-family:inherit;white-space:nowrap}
+.nb:hover{color:#f1f5f9;background:rgba(30,41,59,.5)}
+.nb.on{color:#818cf8;background:rgba(129,140,248,.14)}
+.nb .dot-notif{width:6px;height:6px;background:#f43f5e;border-radius:50%;margin-left:2px}
+
+.main{max-width:1400px;margin:0 auto;padding:28px 24px;position:relative;z-index:1}
+.tab{display:none}.tab.on{display:block}
+
+/* CARDS */
+.card{background:rgba(30,41,59,.42);backdrop-filter:blur(12px);border:1px solid rgba(71,85,105,.32);border-radius:14px}
+.card-hover{transition:all .22s}.card-hover:hover{background:rgba(30,41,59,.65);border-color:rgba(100,116,139,.45);transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.2)}
+
+/* BADGES */
+.bd{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:18px;font-size:.7rem;font-weight:600;border:1px solid;white-space:nowrap}
+.bd .dot{width:5px;height:5px;border-radius:50%;display:inline-block;animation:pls 2s infinite}
+@keyframes pls{0%,100%{opacity:1}50%{opacity:.35}}
+.bd-live{background:rgba(52,211,153,.1);color:#34d399;border-color:rgba(52,211,153,.18)}.bd-live .dot{background:#34d399}
+.bd-dev{background:rgba(251,191,36,.1);color:#fbbf24;border-color:rgba(251,191,36,.18)}.bd-dev .dot{background:#fbbf24}
+.bd-plan{background:rgba(96,165,250,.1);color:#60a5fa;border-color:rgba(96,165,250,.18)}.bd-plan .dot{background:#60a5fa}
+.bd-idea{background:rgba(167,139,250,.1);color:#a78bfa;border-color:rgba(167,139,250,.18)}.bd-idea .dot{background:#a78bfa}
+
+/* GRADIENTS */
+.g-in{background:linear-gradient(135deg,#6366f1,#4f46e5)}
+.g-em{background:linear-gradient(135deg,#10b981,#059669)}
+.g-am{background:linear-gradient(135deg,#f59e0b,#d97706)}
+.g-vi{background:linear-gradient(135deg,#8b5cf6,#7c3aed)}
+.g-ro{background:linear-gradient(135deg,#f43f5e,#e11d48)}
+.g-bl{background:linear-gradient(135deg,#3b82f6,#2563eb)}
+.g-sl{background:linear-gradient(135deg,#64748b,#475569)}
+.g-cy{background:linear-gradient(135deg,#06b6d4,#0891b2)}
+.g-dk{background:linear-gradient(135deg,#374151,#1f2937)}
+
+/* ── AUJOURD'HUI ── */
+.today-header{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:start;margin-bottom:24px}
+.greeting-block h1{font-size:1.8rem;font-weight:700;letter-spacing:-.02em}
+.greeting-block .sub{color:#64748b;font-size:.88rem;margin-top:3px;text-transform:capitalize}
+
+.weather-card{display:flex;align-items:center;gap:14px;padding:16px 22px}
+.weather-icon{font-size:2.4rem;line-height:1}
+.weather-temp{font-size:1.5rem;font-weight:700}
+.weather-desc{color:#94a3b8;font-size:.8rem;margin-top:2px}
+.weather-extra{color:#64748b;font-size:.75rem;margin-top:4px}
+
+.today-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px}
+
+/* Habitudes */
+.habits-card{padding:22px}
+.section-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.section-hd h3{font-size:.95rem;font-weight:600;display:flex;align-items:center;gap:7px}
+.section-hd .reset-btn{font-size:.72rem;color:#64748b;background:none;border:none;cursor:pointer;font-family:inherit;padding:4px 8px;border-radius:6px;transition:all .15s}
+.section-hd .reset-btn:hover{color:#94a3b8;background:rgba(71,85,105,.2)}
+
+.habit{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(71,85,105,.15);cursor:pointer;transition:opacity .15s}
+.habit:last-child{border:none}
+.habit:hover{opacity:.85}
+.habit-check{width:22px;height:22px;border-radius:7px;border:2px solid rgba(71,85,105,.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;font-size:12px}
+.habit.done .habit-check{background:linear-gradient(135deg,#10b981,#059669);border-color:#10b981;color:white}
+.habit-ico{font-size:1.1rem;width:24px;text-align:center;flex-shrink:0}
+.habit-label{font-size:.87rem;font-weight:500;flex:1}
+.habit.done .habit-label{color:#64748b;text-decoration:line-through}
+.habits-progress{margin-top:14px;height:4px;background:rgba(71,85,105,.25);border-radius:99px;overflow:hidden}
+.habits-bar{height:100%;background:linear-gradient(90deg,#10b981,#34d399);border-radius:99px;transition:width .4s ease}
+.habits-count{color:#64748b;font-size:.75rem;margin-top:8px;text-align:right}
+
+/* Idées */
+.ideas-card{padding:22px;display:flex;flex-direction:column}
+.idea-input{background:rgba(15,23,42,.4);border:1px solid rgba(71,85,105,.3);border-radius:10px;padding:10px 13px;color:#f1f5f9;font-size:.85rem;font-family:inherit;resize:none;outline:none;transition:border .2s;height:44px;overflow:hidden}
+.idea-input:focus{border-color:rgba(129,140,248,.4);height:80px}
+.idea-input::placeholder{color:#475569}
+.ideas-list{flex:1;overflow-y:auto;margin-top:12px;display:flex;flex-direction:column;gap:8px;max-height:240px}
+.idea-item{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;background:rgba(15,23,42,.3);border-radius:9px;border:1px solid rgba(71,85,105,.2);font-size:.83rem;color:#94a3b8;line-height:1.4}
+.idea-item .del{margin-left:auto;color:#475569;cursor:pointer;font-size:14px;flex-shrink:0;transition:color .15s;background:none;border:none;padding:0 2px;font-family:inherit}
+.idea-item .del:hover{color:#f43f5e}
+.idea-item .ico{flex-shrink:0;font-size:1rem}
+.idea-add-btn{margin-top:10px;padding:8px;background:rgba(129,140,248,.1);border:1px dashed rgba(129,140,248,.25);border-radius:9px;color:#818cf8;font-size:.8rem;cursor:pointer;font-family:inherit;transition:all .18s;width:100%}
+.idea-add-btn:hover{background:rgba(129,140,248,.18)}
+
+/* Stats rapides */
+.quick-stats{display:flex;flex-direction:column;gap:12px}
+.qs-item{display:flex;align-items:center;gap:12px;padding:12px 16px}
+.qs-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.qs-val{font-size:1.1rem;font-weight:700;line-height:1}
+.qs-label{color:#64748b;font-size:.72rem;margin-top:1px}
+
+/* Liens rapides */
+.quick-links{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px}
+.ql{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 10px;border-radius:12px;text-decoration:none;transition:all .18s}
+.ql:hover{transform:translateY(-2px)}
+.ql .qi{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;transition:transform .18s}
+.ql:hover .qi{transform:scale(1.1)}
+.ql span{color:#94a3b8;font-size:.75rem;font-weight:500;text-align:center}
+
+/* ── AGENDA ── */
+.agenda-card{padding:22px;margin-bottom:24px}
+.ev-bar{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;min-height:70px;align-items:flex-start}
+.ev-bar::-webkit-scrollbar{height:3px}
+.ev-bar::-webkit-scrollbar-track{background:transparent}
+.ev-bar::-webkit-scrollbar-thumb{background:rgba(71,85,105,.25);border-radius:2px}
+.ev-card{flex-shrink:0;padding:12px 15px;border-radius:11px;background:rgba(15,23,42,.35);border:1px solid rgba(71,85,105,.28);min-width:150px;max-width:200px;transition:all .18s;cursor:default}
+.ev-card:hover{border-color:rgba(129,140,248,.35);background:rgba(99,102,241,.07)}
+.ev-time{font-size:.7rem;font-weight:600;color:#818cf8;margin-bottom:5px;font-variant-numeric:tabular-nums}
+.ev-title{font-size:.83rem;font-weight:500;color:#e2e8f0;line-height:1.35}
+.ev-now{border-color:rgba(52,211,153,.32) !important;background:rgba(52,211,153,.07) !important}
+.ev-now .ev-time{color:#34d399}
+.ev-allday{border-color:rgba(167,139,250,.22) !important;background:rgba(167,139,250,.06) !important}
+.ev-allday .ev-time{color:#a78bfa}
+.ev-none{color:#475569;font-size:.83rem;padding:8px 0;align-self:center}
+.ev-setup-wrap{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.ev-setup-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ev-setup-row input{flex:1;min-width:200px;padding:9px 12px;background:rgba(15,23,42,.4);border:1px solid rgba(71,85,105,.3);border-radius:8px;color:#f1f5f9;font-size:.8rem;outline:none;font-family:inherit}
+.ev-setup-row input::placeholder{color:#475569}
+.ev-setup-row input:focus{border-color:rgba(96,165,250,.4)}
+.ev-setup-row button{padding:9px 15px;background:linear-gradient(135deg,#3b82f6,#2563eb);border:none;border-radius:8px;color:#fff;font-weight:600;cursor:pointer;font-family:inherit;font-size:.8rem;white-space:nowrap}
+.ev-hint{color:#475569;font-size:.72rem;line-height:1.5}
+.ev-hint a{color:#60a5fa;text-decoration:none}
+
+/* ── PROJETS ── */
+.pg{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px}
+.pc{padding:20px}.pc:hover{}
+.ph{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.pi{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.pc h3{font-size:.95rem;font-weight:600;margin-bottom:4px}
+.pc .ds{color:#94a3b8;font-size:.81rem;line-height:1.5;margin-bottom:10px}
+.tgs{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
+.tgs span{padding:2px 7px;background:rgba(51,65,85,.5);color:#94a3b8;font-size:.7rem;border-radius:5px;font-weight:500}
+.pl{display:inline-flex;align-items:center;gap:4px;color:#818cf8;font-size:.8rem;text-decoration:none;font-weight:500}
+.pl:hover{color:#a5b4fc}
+
+/* APEX SECTION */
+.apex-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+.apex-card{padding:20px}
+.apex-metric-val{font-size:2rem;font-weight:800;line-height:1;margin-bottom:4px}
+.apex-metric-label{color:#64748b;font-size:.78rem}
+.apex-metric-sub{color:#94a3b8;font-size:.75rem;margin-top:6px}
+.streak-fire{font-size:1.6rem;margin-right:6px}
+
+/* INFRA */
+.il{display:flex;flex-direction:column;gap:12px;margin-bottom:24px}
+.ic{padding:20px;display:flex;gap:16px;align-items:flex-start}
+.ii{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:22px}
+.ic h3{font-size:.95rem;font-weight:600;margin-bottom:3px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.ic .ds{color:#94a3b8;font-size:.83rem;margin-bottom:8px}
+
+.ht-card{padding:22px;margin-top:0}
+.ht-card h3{font-size:.95rem;font-weight:600;margin-bottom:14px}
+.hr{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid rgba(71,85,105,.18);font-size:.83rem}
+.hr:last-child{border:none}
+
+/* OPENCLAW */
+.oc-chat{border-radius:14px;overflow:hidden;margin-bottom:20px}
+.ch{padding:13px 18px;background:linear-gradient(135deg,rgba(139,92,246,.14),rgba(124,58,237,.1));border-bottom:1px solid rgba(71,85,105,.3);display:flex;align-items:center;gap:9px}
+.ch .sn{margin-left:auto;padding:2px 9px;background:rgba(251,191,36,.1);color:#fbbf24;border:1px solid rgba(251,191,36,.18);border-radius:18px;font-size:.7rem;font-weight:600}
+.cm{padding:16px;display:flex;flex-direction:column;gap:10px;max-height:280px;overflow-y:auto;background:rgba(30,41,59,.3)}
+.msg{max-width:76%;padding:9px 13px;border-radius:13px;font-size:.83rem;line-height:1.5}
+.mu{align-self:flex-end;background:rgba(99,102,241,.2);color:#c7d2fe;border-bottom-right-radius:3px}
+.mb{align-self:flex-start;background:rgba(51,65,85,.45);color:#94a3b8;border-bottom-left-radius:3px}
+.ci{padding:13px 16px;border-top:1px solid rgba(71,85,105,.3);background:rgba(30,41,59,.25)}
+.ci input{width:100%;padding:9px 13px;background:rgba(15,23,42,.4);border:1px solid rgba(71,85,105,.3);border-radius:9px;color:#64748b;font-size:.83rem;outline:none;font-family:inherit}
+
+.ocg{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
+.occ{padding:20px}
+.occ h3{font-size:.9rem;font-weight:600;margin-bottom:12px}
+.oci{font-size:.83rem;color:#94a3b8;margin-bottom:7px;padding-left:4px}
+.ctg{display:flex;flex-wrap:wrap;gap:7px}
+.ct{padding:5px 11px;background:rgba(167,139,250,.1);color:#c4b5fd;border:1px solid rgba(167,139,250,.18);border-radius:8px;font-size:.76rem;font-weight:500}
+.cc{padding:20px}
+.cc h3{font-size:.9rem;font-weight:600;margin-bottom:14px}
+.cg{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;text-align:center}
+.cv{font-size:1.4rem;font-weight:700}
+
+/* SECTION TITLE */
+.stt{display:flex;align-items:center;gap:8px;font-size:1rem;font-weight:600;margin-bottom:16px}
+
+/* ROADMAP */
+.rm{padding:22px;margin-top:0}
+.rm h3{font-size:.95rem;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:7px}
+.ri{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid rgba(71,85,105,.18);font-size:.85rem;color:#94a3b8}
+.ri:last-child{border:none}
+
+/* SITE STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px}
+.stat-s{padding:20px}
+.stat-s .name{font-size:.8rem;color:#64748b;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.stat-s .val{font-size:1.5rem;font-weight:700}
+.stat-s .sub{color:#64748b;font-size:.72rem;margin-top:3px}
+.stat-s .trend{font-size:.72rem;margin-top:6px;color:#34d399}
+
+/* FOOTER */
+.ft{border-top:1px solid rgba(71,85,105,.25);margin-top:40px;padding:20px 24px;text-align:center}
+.ft p{color:#475569;font-size:.78rem}
+
+@media(max-width:1100px){.today-grid{grid-template-columns:1fr 1fr}.apex-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:820px){.today-grid{grid-template-columns:1fr}.today-header{grid-template-columns:1fr}.pg{grid-template-columns:1fr 1fr}.apex-grid{grid-template-columns:1fr 1fr}.ocg{grid-template-columns:1fr}.stats-grid{grid-template-columns:1fr}}
+@media(max-width:560px){.pg{grid-template-columns:1fr}.nb span{display:none}.apex-grid{grid-template-columns:1fr}.main{padding:20px 14px}.quick-links{grid-template-columns:repeat(6,1fr)}}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-in">
+    <div class="logo"><div class="logo-i">⚡</div><span>Ecosysteme</span></div>
+    <nav class="nav">
+      <button class="nb on" onclick="go('today',this)">🌅 <span>Aujourd'hui</span></button>
+      <button class="nb" onclick="go('projects',this)">🌐 <span>Projets</span></button>
+      <button class="nb" onclick="go('apex',this)">💪 <span>APEX</span></button>
+      <button class="nb" onclick="go('infra',this)">🖥️ <span>Infra</span></button>
+      <button class="nb" onclick="go('openclaw',this)">🤖 <span>OpenClaw</span></button>
+    </nav>
+    <div id="clock" style="color:#64748b;font-size:.82rem;font-weight:500;min-width:48px;text-align:right"></div>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- ══════════════ AUJOURD'HUI ══════════════ -->
+  <div class="tab on" id="t-today">
+    <div class="today-header">
+      <div class="greeting-block">
+        <h1 id="greet"></h1>
+        <p class="sub" id="dstr"></p>
+      </div>
+      <div class="card weather-card" id="weather-box">
+        <div class="weather-icon" id="w-ico">⏳</div>
+        <div>
+          <div class="weather-temp" id="w-temp">—</div>
+          <div class="weather-desc" id="w-desc">Chargement...</div>
+          <div class="weather-extra" id="w-extra"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PROGRAMME DU JOUR ── -->
+    <div class="card agenda-card">
+      <div class="section-hd">
+        <h3>📅 Programme du jour</h3>
+        <button class="reset-btn" onclick="toggleAgendaSetup()">⚙ Configurer</button>
+      </div>
+      <div id="agenda-setup" style="display:none">
+        <div class="ev-setup-wrap">
+          <div class="ev-setup-row">
+            <input type="text" id="ics-url-input" placeholder="URL iCal privée Google Calendar (https://calendar.google.com/calendar/ical/...)" />
+            <button onclick="connectCalendar()">Connecter</button>
+          </div>
+          <p class="ev-hint">📍 <strong style="color:#94a3b8">Google Calendar</strong> → Paramètres → ton agenda → <em>"Adresse secrète au format iCal"</em> &nbsp;·&nbsp; <a href="https://calendar.google.com/calendar/r/settings" target="_blank">Ouvrir les paramètres ↗</a></p>
+        </div>
+      </div>
+      <div class="ev-bar" id="ev-bar">
+        <div class="ev-none" id="ev-placeholder">Configure ton agenda Google · clique sur ⚙</div>
+      </div>
+    </div>
+
+    <div class="today-grid">
+
+      <!-- HABITUDES -->
+      <div class="card habits-card">
+        <div class="section-hd">
+          <h3>🎯 Habitudes du jour</h3>
+          <button class="reset-btn" onclick="resetHabits()">Réinitialiser</button>
+        </div>
+        <div id="habits-list"></div>
+        <div class="habits-progress"><div class="habits-bar" id="habits-bar" style="width:0%"></div></div>
+        <div class="habits-count" id="habits-count">0 / 0</div>
+      </div>
+
+      <!-- IDÉES -->
+      <div class="card ideas-card">
+        <div class="section-hd"><h3>💡 Idées & Notes</h3></div>
+        <textarea class="idea-input" id="idea-input" placeholder="Nouvelle idée... (Entrée pour valider)" rows="1"></textarea>
+        <div class="ideas-list" id="ideas-list"></div>
+      </div>
+
+      <!-- STATS RAPIDES + LIENS -->
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="card">
+          <div class="quick-stats" id="quick-stats">
+            <div class="qs-item">
+              <div class="qs-icon g-em">💪</div>
+              <div><div class="qs-val" id="qs-streak">—</div><div class="qs-label">Streak APEX</div></div>
+            </div>
+            <div class="qs-item">
+              <div class="qs-icon g-in">🌐</div>
+              <div><div class="qs-val">3 live</div><div class="qs-label">Sites en ligne</div></div>
+            </div>
+            <div class="qs-item">
+              <div class="qs-icon g-vi">🤖</div>
+              <div><div class="qs-val">En dev</div><div class="qs-label">OpenClaw</div></div>
+            </div>
+            <div class="qs-item">
+              <div class="qs-icon g-am">🏠</div>
+              <div><div class="qs-val" id="qs-habits-done">0/0</div><div class="qs-label">Habitudes aujourd'hui</div></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="stt" style="color:#64748b;font-size:.82rem;font-weight:500;margin-bottom:10px">Accès rapide</div>
+          <div class="quick-links">
+            <a class="ql card" href="https://programme-sport.vercel.app" target="_blank"><div class="qi g-em">💪</div><span>APEX</span></a>
+            <a class="ql card" href="https://calendar.google.com" target="_blank"><div class="qi g-bl">📅</div><span>Agenda</span></a>
+            <a class="ql card" href="https://mail.proton.me" target="_blank"><div class="qi g-in">📧</div><span>Email</span></a>
+            <a class="ql card" href="https://notion.so" target="_blank"><div class="qi g-sl">📝</div><span>Notion</span></a>
+            <a class="ql card" href="https://kdrive.infomaniak.com" target="_blank"><div class="qi g-em">💾</div><span>KDrive</span></a>
+            <a class="ql card" href="https://vercel.com/dashboard" target="_blank"><div class="qi g-dk">▲</div><span>Vercel</span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ PROJETS ══════════════ -->
+  <div class="tab" id="t-projects">
+    <div class="stt" style="color:#818cf8">🌐 Tous les projets</div>
+    <div class="pg">
+      <div class="card card-hover pc"><div class="ph"><div class="pi g-em">💪</div><span class="bd bd-live"><span class="dot"></span>En ligne</span></div><h3>APEX</h3><p class="ds">App de musculation avec programmes personnalises, suivi de progression et timer.</p><div class="tgs"><span>Next.js 15</span><span>React 19</span><span>Supabase</span><span>Tailwind</span></div><a class="pl" href="https://programme-sport.vercel.app" target="_blank">Visiter ↗</a></div>
+      <div class="card card-hover pc"><div class="ph"><div class="pi g-vi">🤖</div><span class="bd bd-dev"><span class="dot"></span>En cours</span></div><h3>OpenClaw</h3><p class="ds">Agent IA sur Telegram avec memoire persistante et outils connectes.</p><div class="tgs"><span>Python 3.11</span><span>Claude API</span><span>Telegram</span><span>systemd</span></div></div>
+      <div class="card card-hover pc"><div class="ph"><div class="pi g-bl">🌐</div><span class="bd bd-dev"><span class="dot"></span>En cours</span></div><h3>jeromesuider.fr</h3><p class="ds">Site personnel & portfolio avec blog et CMS headless.</p><div class="tgs"><span>Next.js</span><span>Sanity CMS</span><span>Tailwind</span><span>Vercel</span></div><a class="pl" href="https://jeromesuider.fr" target="_blank">Visiter ↗</a></div>
+      <div class="card card-hover pc"><div class="ph"><div class="pi g-am">⚡</div><span class="bd bd-live"><span class="dot"></span>En ligne</span></div><h3>WattSavoir</h3><p class="ds">FAQ energie avec 9 outils interactifs, simulateurs et comparateur.</p><div class="tgs"><span>Next.js 14</span><span>Netlify</span></div><a class="pl" href="https://wattsavoir.fr" target="_blank">Visiter ↗</a></div>
+      <div class="card card-hover pc"><div class="ph"><div class="pi g-ro">🏠</div><span class="bd bd-live"><span class="dot"></span>En ligne</span></div><h3>calculer-mes-aides.fr</h3><p class="ds">Simulateur d'aides a la renovation energetique.</p><div class="tgs"><span>WordPress 5.9</span><span>Lead Gen</span></div><a class="pl" href="https://calculer-mes-aides.fr" target="_blank">Visiter ↗</a></div>
+      <div class="card card-hover pc"><div class="ph"><div class="pi g-sl">📝</div><span class="bd bd-live"><span class="dot"></span>En ligne</span></div><h3>Notion Hub</h3><p class="ds">Centre de commande : 14 pages + 1 base de donnees.</p><div class="tgs"><span>Notion</span><span>14 pages</span><span>1 DB</span></div></div>
+    </div>
+
+    <div class="stt" style="color:#64748b;margin-top:8px">📊 Stats sites</div>
+    <div class="stats-grid">
+      <div class="card stat-s">
+        <div class="name">⚡ WattSavoir</div>
+        <div class="val">—</div><div class="sub">Visiteurs / mois</div>
+        <div class="trend">↗ Connecter Netlify Analytics</div>
+      </div>
+      <div class="card stat-s">
+        <div class="name">🏠 calculer-mes-aides.fr</div>
+        <div class="val">—</div><div class="sub">Visiteurs / mois</div>
+        <div class="trend">↗ Connecter WP Stats</div>
+      </div>
+      <div class="card stat-s">
+        <div class="name">💪 APEX</div>
+        <div class="val">—</div><div class="sub">Sessions actives</div>
+        <div class="trend">↗ Connecter Vercel Analytics</div>
+      </div>
+    </div>
+
+    <div class="card rm">
+      <h3>📈 Roadmap</h3>
+      <div class="ri"><span>Video Pipeline YouTube/TikTok</span><span class="bd bd-idea"><span class="dot"></span>Idee</span></div>
+      <div class="ri"><span>Raspberry Pi + Yunohost</span><span class="bd bd-plan"><span class="dot"></span>Planifie</span></div>
+      <div class="ri"><span>Monetisation WattSavoir</span><span class="bd bd-plan"><span class="dot"></span>Planifie</span></div>
+      <div class="ri"><span>OpenClaw integre au dashboard</span><span class="bd bd-dev"><span class="dot"></span>En cours</span></div>
+    </div>
+  </div>
+
+  <!-- ══════════════ APEX ══════════════ -->
+  <div class="tab" id="t-apex">
+    <div class="stt" style="color:#34d399">💪 APEX — Suivi musculation</div>
+    <div class="apex-grid">
+      <div class="card apex-card">
+        <div class="apex-metric-val" id="apex-streak" style="color:#fbbf24"><span class="streak-fire">🔥</span>—</div>
+        <div class="apex-metric-label">Streak d'entrainements</div>
+        <div class="apex-metric-sub" id="apex-streak-sub">Connexion Supabase requise</div>
+      </div>
+      <div class="card apex-card">
+        <div class="apex-metric-val" id="apex-week" style="color:#34d399">—</div>
+        <div class="apex-metric-label">Seances cette semaine</div>
+        <div class="apex-metric-sub" id="apex-week-sub">sur 4 objectif</div>
+      </div>
+      <div class="card apex-card">
+        <div class="apex-metric-val" id="apex-last" style="color:#818cf8">—</div>
+        <div class="apex-metric-label">Derniere seance</div>
+        <div class="apex-metric-sub" id="apex-last-sub">Programme V-Taper</div>
+      </div>
+    </div>
+
+    <div class="card" style="padding:24px;margin-bottom:20px">
+      <h3 style="font-size:.95rem;font-weight:600;margin-bottom:16px;color:#94a3b8">Connecter APEX (Supabase)</h3>
+      <p style="color:#64748b;font-size:.85rem;line-height:1.6;margin-bottom:16px">Pour afficher tes stats en temps reel, saisis ta cle Supabase anon (disponible dans les settings de ton projet APEX sur supabase.com).</p>
+      <div style="display:flex;gap:10px">
+        <input type="text" id="sb-url" placeholder="URL Supabase (https://xxx.supabase.co)" style="flex:1;padding:10px 13px;background:rgba(15,23,42,.4);border:1px solid rgba(71,85,105,.3);border-radius:9px;color:#f1f5f9;font-size:.83rem;outline:none;font-family:inherit">
+        <input type="text" id="sb-key" placeholder="Cle anon..." style="flex:1;padding:10px 13px;background:rgba(15,23,42,.4);border:1px solid rgba(71,85,105,.3);border-radius:9px;color:#f1f5f9;font-size:.83rem;outline:none;font-family:inherit">
+        <button onclick="connectSupabase()" style="padding:10px 18px;background:linear-gradient(135deg,#10b981,#059669);border:none;border-radius:9px;color:#fff;font-weight:600;cursor:pointer;font-family:inherit;font-size:.83rem;white-space:nowrap">Connecter</button>
+      </div>
+      <div id="sb-status" style="margin-top:10px;font-size:.78rem;color:#64748b"></div>
+    </div>
+
+    <div class="card" style="padding:24px">
+      <h3 style="font-size:.95rem;font-weight:600;margin-bottom:4px">Programme actuel</h3>
+      <p style="color:#64748b;font-size:.82rem;margin-bottom:16px">V-Taper · Phase hypertrophie</p>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+        <div style="padding:14px;background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.15);border-radius:10px;text-align:center">
+          <div style="font-size:.75rem;color:#34d399;font-weight:600;margin-bottom:4px">LUNDI</div>
+          <div style="font-size:.82rem;color:#94a3b8">Push</div>
+        </div>
+        <div style="padding:14px;background:rgba(96,165,250,.07);border:1px solid rgba(96,165,250,.15);border-radius:10px;text-align:center">
+          <div style="font-size:.75rem;color:#60a5fa;font-weight:600;margin-bottom:4px">MERCREDI</div>
+          <div style="font-size:.82rem;color:#94a3b8">Pull</div>
+        </div>
+        <div style="padding:14px;background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.15);border-radius:10px;text-align:center">
+          <div style="font-size:.75rem;color:#fbbf24;font-weight:600;margin-bottom:4px">VENDREDI</div>
+          <div style="font-size:.82rem;color:#94a3b8">Legs</div>
+        </div>
+        <div style="padding:14px;background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.15);border-radius:10px;text-align:center">
+          <div style="font-size:.75rem;color:#a78bfa;font-weight:600;margin-bottom:4px">SAMEDI</div>
+          <div style="font-size:.82rem;color:#94a3b8">Upper</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ INFRA ══════════════ -->
+  <div class="tab" id="t-infra">
+    <div class="stt">🖥️ Infrastructure & Stockage</div>
+    <div class="il">
+      <div class="card ic"><div class="ii g-am">🖥️</div><div><h3>La Tour <span class="bd bd-live"><span class="dot"></span>En ligne</span></h3><p class="ds">Desktop tower — serveur principal IA & automation, toujours allume.</p><div class="tgs"><span>OpenClaw</span><span>Python 3.11</span><span>systemd</span><span>Claude API</span></div></div></div>
+      <div class="card ic"><div class="ii g-ro">🍓</div><div><h3>Raspberry Pi <span class="bd bd-plan"><span class="dot"></span>Planifie</span></h3><p class="ds">Yunohost — auto-hebergement : fichiers, services web, NextCloud.</p><div class="tgs"><span>Yunohost</span><span>Nextcloud</span><span>Services web</span></div></div></div>
+      <div class="card ic"><div class="ii g-em">💾</div><div><h3>Stockage 3-2-1 <span class="bd bd-live"><span class="dot"></span>Actif</span></h3><p class="ds">3 copies, 2 supports, 1 offsite.</p><div class="tgs"><span>KDrive 3 To</span><span>Proton Drive E2E</span><span>Local</span></div></div></div>
+    </div>
+    <div class="card ht-card">
+      <h3>Hebergement web</h3>
+      <div class="hr"><span style="color:#f1f5f9;font-weight:500">APEX</span><div style="display:flex;gap:16px"><span style="color:#64748b">Vercel</span><span style="color:#818cf8">programme-sport.vercel.app</span></div></div>
+      <div class="hr"><span style="color:#f1f5f9;font-weight:500">jeromesuider.fr</span><div style="display:flex;gap:16px"><span style="color:#64748b">Vercel + OVH</span><span style="color:#818cf8">jeromesuider.fr</span></div></div>
+      <div class="hr"><span style="color:#f1f5f9;font-weight:500">WattSavoir</span><div style="display:flex;gap:16px"><span style="color:#64748b">Netlify</span><span style="color:#818cf8">wattsavoir.fr</span></div></div>
+      <div class="hr"><span style="color:#f1f5f9;font-weight:500">calculer-mes-aides.fr</span><div style="display:flex;gap:16px"><span style="color:#64748b">WordPress/OVH</span><span style="color:#818cf8">calculer-mes-aides.fr</span></div></div>
+      <div class="hr"><span style="color:#f1f5f9;font-weight:500">Dashboard</span><div style="display:flex;gap:16px"><span style="color:#64748b">OVH FTP</span><span style="color:#818cf8">dashboard.jeromesuider.fr</span></div></div>
+    </div>
+  </div>
+
+  <!-- ══════════════ OPENCLAW ══════════════ -->
+  <div class="tab" id="t-openclaw">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div class="stt" style="color:#a78bfa;margin-bottom:0">🤖 OpenClaw — Assistant IA</div>
+      <span class="bd bd-dev"><span class="dot"></span>En cours</span>
+    </div>
+    <div class="card oc-chat">
+      <div class="ch"><span style="font-size:18px">🤖</span><span style="font-weight:600;font-size:.88rem">OpenClaw</span><span style="color:#64748b;font-size:.78rem;margin-left:4px">— Assistant IA Personnel</span><span class="sn">Bientot</span></div>
+      <div class="cm">
+        <div class="msg mu">Quels sont mes prochains rendez-vous ?</div>
+        <div class="msg mb">Tu as 2 rendez-vous cette semaine : dentiste mardi a 10h et ADIL jeudi a 14h.</div>
+        <div class="msg mu">Rappelle-moi de mettre a jour WattSavoir demain</div>
+        <div class="msg mb">Rappel cree pour demain 9h ✓</div>
+        <div class="msg mu">Quel est le statut de mes projets ?</div>
+        <div class="msg mb">3 projets live, 2 en dev, le Pi est en attente. Tout roule !</div>
+      </div>
+      <div class="ci"><input type="text" placeholder="Bientot disponible..." disabled></div>
+    </div>
+    <div class="ocg">
+      <div class="card occ"><h3>Architecture</h3>
+        <div class="oci">✅ Bot Telegram comme interface</div>
+        <div class="oci">✅ Memoire persistante (SOUL.md)</div>
+        <div class="oci">✅ Service systemd 24/7 sur La Tour</div>
+        <div class="oci">⏳ Integrations (Calendar, Notion...)</div>
+        <div class="oci">⏳ Interface dashboard (ce panneau)</div>
+      </div>
+      <div class="card occ"><h3>Connexions prevues</h3>
+        <div class="ctg"><span class="ct">Nextcloud</span><span class="ct">Google Calendar</span><span class="ct">Notion</span><span class="ct">FreshRSS</span><span class="ct">Email IMAP</span><span class="ct">Vikunja</span><span class="ct">YouTube API</span><span class="ct">TikTok API</span></div>
+      </div>
+    </div>
+    <div class="card cc"><h3>Cout mensuel estime</h3>
+      <div class="cg">
+        <div><div class="cv" style="color:#34d399">~5€</div><div style="color:#64748b;font-size:.73rem;margin-top:2px">Haiku (min)</div></div>
+        <div><div class="cv" style="color:#fbbf24">~8€</div><div style="color:#64748b;font-size:.73rem;margin-top:2px">Mix (reco)</div></div>
+        <div><div class="cv" style="color:#fb7185">~15€</div><div style="color:#64748b;font-size:.73rem;margin-top:2px">Sonnet (max)</div></div>
+      </div>
+      <p style="color:#475569;font-size:.73rem;text-align:center;margin-top:12px">par mois · heberge sur La Tour</p>
+    </div>
+  </div>
+
+</div>
+
+<footer class="ft"><p>Ecosysteme Jerome · dashboard.jeromesuider.fr</p></footer>
+
+<script>
+// ─── NAVIGATION ───
+function go(id, btn) {
+  document.querySelectorAll('.tab').forEach(function(t){ t.className='tab'; });
+  document.querySelectorAll('.nb').forEach(function(b){ b.className='nb'; });
+  document.getElementById('t-'+id).className='tab on';
+  if(btn) btn.className='nb on';
+}
+
+// ─── DATE & HEURE ───
+function updateClock() {
+  var now = new Date();
+  document.getElementById('clock').textContent = now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+}
+function setDate() {
+  var now = new Date(), h = now.getHours();
+  var g = h < 6 ? 'Bonne nuit' : h < 12 ? 'Bonjour' : h < 18 ? 'Bon apres-midi' : 'Bonsoir';
+  document.getElementById('greet').textContent = g + ', Jerome ✦';
+  document.getElementById('dstr').textContent = now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+setDate(); updateClock(); setInterval(updateClock, 1000);
+
+// ─── MÉTÉO (Open-Meteo, Paris) ───
+var WMO = {0:'☀️ Ciel dégagé',1:'🌤️ Peu nuageux',2:'⛅ Partiellement nuageux',3:'☁️ Couvert',45:'🌫️ Brouillard',48:'🌫️ Brouillard givrant',51:'🌦️ Bruine légère',53:'🌦️ Bruine',55:'🌧️ Bruine forte',61:'🌧️ Pluie légère',63:'🌧️ Pluie',65:'🌧️ Pluie forte',71:'🌨️ Neige légère',73:'🌨️ Neige',75:'🌨️ Neige forte',80:'🌦️ Averses légères',81:'🌧️ Averses',82:'⛈️ Averses fortes',95:'⛈️ Orage',96:'⛈️ Orage avec grele',99:'⛈️ Orage violent'};
+function fetchWeather() {
+  fetch('https://api.open-meteo.com/v1/forecast?latitude=48.86&longitude=2.35&current=temperature_2m,weather_code,wind_speed_10m,relative_humidity_2m&wind_speed_unit=kmh&timezone=Europe%2FParis')
+    .then(function(r){ return r.json(); })
+    .then(function(d) {
+      var c = d.current;
+      var code = c.weather_code;
+      var desc = WMO[code] || '🌡️ Conditions variables';
+      var parts = desc.split(' '); var ico = parts[0]; var txt = parts.slice(1).join(' ');
+      document.getElementById('w-ico').textContent = ico;
+      document.getElementById('w-temp').textContent = Math.round(c.temperature_2m) + '°C';
+      document.getElementById('w-desc').textContent = txt;
+      document.getElementById('w-extra').textContent = 'Vent ' + Math.round(c.wind_speed_10m) + ' km/h · Humidité ' + c.relative_humidity_2m + '%';
+    })
+    .catch(function(){ document.getElementById('w-desc').textContent = 'Météo indisponible'; });
+}
+fetchWeather();
+
+// ─── HABITUDES ───
+var HABITS_KEY = 'jerome_habits_v2';
+var HABITS_DATE_KEY = 'jerome_habits_date';
+var DEFAULT_HABITS = [
+  { id:'meditation', ico:'🧘', label:'Méditation' },
+  { id:'lecture',    ico:'📚', label:'Lecture' },
+  { id:'etirements', ico:'🤸', label:'Étirements' },
+  { id:'sport',      ico:'💪', label:'Entraînement APEX' },
+  { id:'ecriture',   ico:'✍️', label:'Écriture' },
+  { id:'business',   ico:'💼', label:'Business' },
+  { id:'creativite', ico:'🎨', label:'Créativité' },
+  { id:'digital',    ico:'🌿', label:'Heure sans écran' },
+];
+
+function getTodayKey() {
+  return new Date().toISOString().slice(0,10);
+}
+
+function loadHabits() {
+  var today = getTodayKey();
+  var savedDate = localStorage.getItem(HABITS_DATE_KEY);
+  if (savedDate !== today) {
+    localStorage.setItem(HABITS_DATE_KEY, today);
+    localStorage.setItem(HABITS_KEY, JSON.stringify({}));
+  }
+  return JSON.parse(localStorage.getItem(HABITS_KEY) || '{}');
+}
+
+function saveHabits(done) {
+  localStorage.setItem(HABITS_KEY, JSON.stringify(done));
+}
+
+function renderHabits() {
+  var done = loadHabits();
+  var list = document.getElementById('habits-list');
+  var count = 0;
+  list.innerHTML = DEFAULT_HABITS.map(function(h) {
+    var isDone = !!done[h.id];
+    if (isDone) count++;
+    return '<div class="habit' + (isDone?' done':'') + '" onclick="toggleHabit(\''+h.id+'\')">' +
+      '<div class="habit-check">' + (isDone ? '✓' : '') + '</div>' +
+      '<div class="habit-ico">' + h.ico + '</div>' +
+      '<div class="habit-label">' + h.label + '</div>' +
+    '</div>';
+  }).join('');
+  var pct = Math.round(count / DEFAULT_HABITS.length * 100);
+  document.getElementById('habits-bar').style.width = pct + '%';
+  document.getElementById('habits-count').textContent = count + ' / ' + DEFAULT_HABITS.length + ' accompli' + (count > 1 ? 's' : '');
+  document.getElementById('qs-habits-done').textContent = count + '/' + DEFAULT_HABITS.length;
+}
+
+function toggleHabit(id) {
+  var done = loadHabits();
+  done[id] = !done[id];
+  if (!done[id]) delete done[id];
+  saveHabits(done);
+  renderHabits();
+}
+
+function resetHabits() {
+  localStorage.setItem(HABITS_KEY, JSON.stringify({}));
+  renderHabits();
+}
+
+renderHabits();
+
+// ─── IDÉES ───
+var IDEAS_KEY = 'jerome_ideas_v1';
+
+function loadIdeas() {
+  return JSON.parse(localStorage.getItem(IDEAS_KEY) || '[]');
+}
+
+function saveIdeas(ideas) {
+  localStorage.setItem(IDEAS_KEY, JSON.stringify(ideas));
+}
+
+function renderIdeas() {
+  var ideas = loadIdeas();
+  var list = document.getElementById('ideas-list');
+  if (ideas.length === 0) {
+    list.innerHTML = '<div style="color:#475569;font-size:.8rem;text-align:center;padding:20px 0">Aucune idee pour l\'instant.<br>Tape et appuie sur Entree !</div>';
+    return;
+  }
+  list.innerHTML = ideas.map(function(idea, i) {
+    return '<div class="idea-item">' +
+      '<span class="ico">💡</span>' +
+      '<span style="flex:1">' + escHtml(idea) + '</span>' +
+      '<button class="del" onclick="deleteIdea('+i+')">✕</button>' +
+    '</div>';
+  }).reverse().join('');
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function deleteIdea(i) {
+  var ideas = loadIdeas();
+  ideas.splice(i, 1);
+  saveIdeas(ideas);
+  renderIdeas();
+}
+
+document.getElementById('idea-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    var val = this.value.trim();
+    if (!val) return;
+    var ideas = loadIdeas();
+    ideas.push(val);
+    saveIdeas(ideas);
+    this.value = '';
+    renderIdeas();
+  }
+});
+
+renderIdeas();
+
+// ─── AGENDA (Google Calendar ICS) ───
+var ICS_KEY = 'jerome_ics_url';
+
+function toggleAgendaSetup() {
+  var s = document.getElementById('agenda-setup');
+  s.style.display = (s.style.display === 'none' || s.style.display === '') ? 'block' : 'none';
+  var saved = localStorage.getItem(ICS_KEY);
+  if (saved) document.getElementById('ics-url-input').value = saved;
+}
+
+function connectCalendar() {
+  var url = document.getElementById('ics-url-input').value.trim();
+  if (!url) return;
+  localStorage.setItem(ICS_KEY, url);
+  document.getElementById('agenda-setup').style.display = 'none';
+  fetchCalendar(url);
+}
+
+function fetchCalendar(url) {
+  var bar = document.getElementById('ev-bar');
+  bar.innerHTML = '<div class="ev-none">Chargement...</div>';
+  // Use CORS proxy to bypass browser restrictions
+  var proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(url);
+  fetch(proxyUrl)
+    .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+    .then(function(txt) {
+      var events = parseICS(txt);
+      var todayEvs = getTodayEvents(events);
+      renderAgenda(todayEvs);
+    })
+    .catch(function(err) {
+      bar.innerHTML = '<div class="ev-none" style="color:#f43f5e">Erreur · Vérifie l\'URL iCal · <button onclick="toggleAgendaSetup()" style="background:none;border:none;color:#f43f5e;cursor:pointer;font-size:.83rem;text-decoration:underline;font-family:inherit">Modifier ↗</button></div>';
+    });
+}
+
+function parseICS(text) {
+  var events = [];
+  // Unfold RFC 5545 continuation lines
+  text = text.replace(/\r\n[ \t]/g,'').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+  var lines = text.split('\n');
+  var ev = null;
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i].trim();
+    if (line === 'BEGIN:VEVENT') { ev = {}; }
+    else if (line === 'END:VEVENT') { if (ev && ev.start) events.push(ev); ev = null; }
+    else if (ev) {
+      var colon = line.indexOf(':');
+      if (colon === -1) continue;
+      var key = line.slice(0, colon).split(';')[0].toUpperCase();
+      var val = line.slice(colon + 1).trim();
+      if (key === 'SUMMARY') {
+        ev.summary = val.replace(/\\n/g,' ').replace(/\\,/g,',').replace(/\\;/g,';').replace(/\\N/g,' ');
+      } else if (key === 'DTSTART') {
+        ev.allDay = val.length === 8;
+        ev.start = parseICSDate(val);
+      } else if (key === 'DTEND') {
+        ev.end = parseICSDate(val);
+      }
+    }
+  }
+  return events;
+}
+
+function parseICSDate(val) {
+  if (!val) return null;
+  val = val.replace(/[^0-9TZ]/g,'').trim();
+  if (val.length === 8) {
+    return new Date(parseInt(val.slice(0,4)), parseInt(val.slice(4,6))-1, parseInt(val.slice(6,8)));
+  }
+  var y=parseInt(val.slice(0,4)), mo=parseInt(val.slice(4,6))-1, d=parseInt(val.slice(6,8));
+  var h=parseInt(val.slice(9,11)||'0'), mi=parseInt(val.slice(11,13)||'0'), s=parseInt(val.slice(13,15)||'0');
+  if (val.endsWith('Z')) return new Date(Date.UTC(y,mo,d,h,mi,s));
+  return new Date(y,mo,d,h,mi,s);
+}
+
+function getTodayEvents(events) {
+  var now = new Date();
+  var y=now.getFullYear(), m=now.getMonth(), day=now.getDate();
+  return events.filter(function(ev) {
+    if (!ev.start) return false;
+    return ev.start.getFullYear()===y && ev.start.getMonth()===m && ev.start.getDate()===day;
+  }).sort(function(a,b){ return a.start - b.start; });
+}
+
+function renderAgenda(events) {
+  var bar = document.getElementById('ev-bar');
+  if (!events.length) {
+    bar.innerHTML = '<div class="ev-none">Aucun événement aujourd\'hui 🎉</div>';
+    return;
+  }
+  var now = new Date();
+  bar.innerHTML = events.map(function(ev) {
+    var timeStr = ev.allDay ? 'Toute la journée' : ev.start.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+    var isNow = !ev.allDay && ev.start <= now && ev.end && ev.end >= now;
+    var cls = 'ev-card' + (ev.allDay ? ' ev-allday' : '') + (isNow ? ' ev-now' : '');
+    return '<div class="'+cls+'">' +
+      '<div class="ev-time">' + (isNow ? '● En cours · ' : '') + timeStr + '</div>' +
+      '<div class="ev-title">' + escHtml(ev.summary) + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+(function initCalendar() {
+  var url = localStorage.getItem(ICS_KEY);
+  if (url) fetchCalendar(url);
+  // else placeholder text already shown
+})();
+
+// ─── SUPABASE (APEX) ───
+function connectSupabase() {
+  var url = document.getElementById('sb-url').value.trim();
+  var key = document.getElementById('sb-key').value.trim();
+  if (!url || !key) { document.getElementById('sb-status').textContent = 'Remplis les deux champs.'; return; }
+  localStorage.setItem('jerome_sb_url', url);
+  localStorage.setItem('jerome_sb_key', key);
+  document.getElementById('sb-status').textContent = 'Sauvegarde ! Chargement des donnees...';
+  fetchApexData(url, key);
+}
+
+function fetchApexData(url, key) {
+  fetch(url + '/rest/v1/sessions?select=date,completed&order=date.desc&limit=30', {
+    headers: { 'apikey': key, 'Authorization': 'Bearer ' + key }
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data) {
+    if (!Array.isArray(data)) { document.getElementById('sb-status').textContent = 'Erreur de lecture. Verifie ta cle.'; return; }
+    var completed = data.filter(function(s){ return s.completed; });
+    var streak = calcStreak(completed.map(function(s){ return s.date.slice(0,10); }));
+    var thisWeek = completed.filter(function(s){
+      var d = new Date(s.date), now = new Date();
+      var diff = (now - d) / 86400000;
+      return diff <= 7;
+    }).length;
+    var lastDate = completed.length ? new Date(completed[0].date).toLocaleDateString('fr-FR',{day:'numeric',month:'short'}) : '—';
+    document.getElementById('apex-streak').innerHTML = '<span class="streak-fire">🔥</span>' + streak;
+    document.getElementById('apex-streak-sub').textContent = streak > 1 ? streak + ' jours consecutifs' : 'Continue !';
+    document.getElementById('apex-week').textContent = thisWeek;
+    document.getElementById('apex-last').textContent = lastDate;
+    document.getElementById('qs-streak').textContent = streak + ' 🔥';
+    document.getElementById('sb-status').textContent = 'Connecte ! ' + completed.length + ' seances trouvees.';
+  })
+  .catch(function(){ document.getElementById('sb-status').textContent = 'Erreur reseau.'; });
+}
+
+function calcStreak(dates) {
+  if (!dates.length) return 0;
+  var sorted = dates.slice().sort().reverse();
+  var streak = 1, prev = new Date(sorted[0]);
+  for (var i = 1; i < sorted.length; i++) {
+    var cur = new Date(sorted[i]);
+    var diff = Math.round((prev - cur) / 86400000);
+    if (diff === 1) { streak++; prev = cur; } else break;
+  }
+  return streak;
+}
+
+// Reload saved Supabase creds on load
+(function(){
+  var url = localStorage.getItem('jerome_sb_url');
+  var key = localStorage.getItem('jerome_sb_key');
+  if (url && key) {
+    document.getElementById('sb-url').value = url;
+    document.getElementById('sb-key').value = key;
+    fetchApexData(url, key);
+  }
+})();
+</script>
+</body>
+</html>
